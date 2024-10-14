@@ -1,0 +1,8 @@
+Sites locaux : 
+http://localhost:8545/ : API où les contrats communiquent entre eux. Permet de requêter les données des contrats. 
+http://localhost:5173/ : Frontend, interface. 
+
+Cours de crypto :
+https://cryptozombies.io/en/course/
+
+Testnet pour tester sur un réseau test avec des ethers gratuits.

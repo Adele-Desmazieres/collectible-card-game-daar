@@ -6,6 +6,7 @@ import "./Collection.sol";
 contract Main {
   int private count;
   mapping(int => Collection) private collections;
+  mapping(address => int) public ownerToCollection;
 
   constructor() {
     count = 0;
@@ -14,4 +15,9 @@ contract Main {
   function createCollection(string calldata name, int cardCount) external {
     collections[count++] = new Collection(name, cardCount);
   }
+  
+  function getCollection(address _owner) public view returns (Collection) {
+    return collections[ownerToCollection[_owner]];
+  }
+  
 }
