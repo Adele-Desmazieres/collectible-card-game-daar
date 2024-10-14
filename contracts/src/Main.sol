@@ -1,23 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
-import "./Collection.sol";
+import "./Extension.sol";
 
 contract Main {
   int private count;
-  mapping(int => Collection) private collections;
-  mapping(address => int) public ownerToCollection;
+  mapping(int => Extension) private extensions;
 
   constructor() {
     count = 0;
   }
 
-  function createCollection(string calldata name, int cardCount) external {
-    collections[count++] = new Collection(name, cardCount);
+  function createExtension(string calldata name, int cardCount) external {
+    extensions[count++] = new Extension(name, cardCount);
   }
-  
-  function getCollection(address _owner) public view returns (Collection) {
-    return collections[ownerToCollection[_owner]];
-  }
-  
 }
