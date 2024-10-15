@@ -9,12 +9,10 @@ contract CardSet {
   string public name;
   int public cardCount;
   address[] public cards;
-  uint256 public dateCreation;
 
-  constructor(string memory _name, int _cardCount, address[] memory _cards, uint256 _dateCreation) {
+  constructor(string memory _name, int _cardCount, address[] memory _cards) {
     name = _name;
     cardCount = _cardCount;
     cards = _cards;
-    dateCreation = _dateCreation;
   }
 }

@@ -1,17 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
-import "./Extension.sol";
+import "./CardSet.sol";
 
-contract Main {
+contract Main is Ownable {
+  address owner;
   int private count;
-  mapping(int => Extension) private extensions;
+  mapping(int => CardSet) private sets;
+  mapping(address => Card) private cards;
 
-  constructor() {
+  constructor(address _owner) Ownable(owner) {
+    owner = _owner;
     count = 0;
   }
 
-  function createExtension(string calldata name, int cardCount) external {
-    extensions[count++] = new Extension(name, cardCount);
+  function createCard(string memory data, string memory img) external returns (address) {
+    // todo
+    return address(new Card(address(0), data, img));
+  }
+
+  function createExtension(
+    string calldata name,
+    int cardCount,
+    address[] memory setCards
+  ) external {
+    sets[count++] = new CardSet(name, cardCount, setCards);
   }
 }
