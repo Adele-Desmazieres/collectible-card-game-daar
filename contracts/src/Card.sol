@@ -8,17 +8,15 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./CardSet.sol";
 
 contract Card is Ownable, ERC721 {
-  address owner;
   string data; // les données en format JSON
   string img; // url de l'image
 
   constructor(
-    address _owner,
+    address owner,
     string memory _data,
     string memory _img
-  ) Ownable(_owner) ERC721("Pokemon Card", "PKMC") {
+  ) Ownable(owner) ERC721("Pokemon Card", "PKMC") {
     data = _data;
-    owner = _owner;
     img = _img;
   }
 

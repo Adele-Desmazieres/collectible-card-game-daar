@@ -4,13 +4,11 @@ pragma solidity ^0.8;
 import "./CardSet.sol";
 
 contract Main is Ownable {
-  address owner;
   int private count;
   mapping(int => CardSet) private sets;
   mapping(address => Card) private cards;
 
-  constructor(address _owner) Ownable(owner) {
-    owner = _owner;
+  constructor() Ownable(msg.sender) {
     count = 0;
   }
 
