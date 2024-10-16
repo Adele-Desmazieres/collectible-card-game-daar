@@ -12,9 +12,13 @@ contract Main is Ownable {
     count = 0;
   }
 
-  function createCard(string memory data, string memory img) external returns (address) {
+  function createCard(string memory data, string memory img) external returns (Card) {
     // todo
-    return address(new Card(address(0), data, img));
+    return new Card(address(msg.sender), data, img);
+  }
+  
+  function dummy() external pure returns (int) {
+    return 777;
   }
 
   function createExtension(

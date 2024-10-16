@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
+import { Contract } from 'ethers'
 
 type Canceler = () => void
 const useAffect = (
@@ -39,11 +40,18 @@ const useWallet = () => {
   }, [details, contract])
 }
 
+
+// document.querySelector('#btn-models').addEventListener('click', (e:Event) => getModels());
+const createCard = (wallet:any) => {
+  wallet?.contract.createCard("bonjour", "monde").then((res:any) => console.log(res))
+}
+
 export const App = () => {
   const wallet = useWallet()
   return (
     <div className={styles.body}>
       <h1>Welcome to Pokémon TCG</h1>
+      <button id='btn-models' value="Get Models" onClick={() => createCard(wallet)}>Create Card</button>
     </div>
   )
 }

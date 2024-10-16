@@ -23,5 +23,12 @@ contract Card is Ownable, ERC721 {
   function assignCard(
     address new_owner,
     string memory tokenUri
-  ) public returns (uint256) {}
+  ) public returns (uint256) {
+    // this.owner = new_owner;
+  }
+  
+  function balanceOf() external {
+    
+  }
+  
 }
