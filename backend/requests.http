@@ -1,0 +1,4 @@
+### get card
+X-Api-Key: f42e06f8-fac3-4084-ab87-ac7d4da20e36
+GET http://localhost:3000/by-id/base1-4
+

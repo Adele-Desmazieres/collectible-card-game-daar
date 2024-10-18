@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import styles from './styles.module.css'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
-import { Contract } from 'ethers'
+import { PokemonCard } from './components/PokemonCard'
+import { getCardById } from './server'
+import './index.css'
 
 type Canceler = () => void
 const useAffect = (
@@ -49,7 +50,7 @@ const createCard = (wallet:any) => {
 export const App = () => {
   const wallet = useWallet()
   return (
-    <div className={styles.body}>
+    <div>
       <h1>Welcome to Pokémon TCG</h1>
       <button id='btn-models' value="Get Models" onClick={() => createCard(wallet)}>Create Card</button>
     </div>
