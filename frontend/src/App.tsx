@@ -42,18 +42,6 @@ const useWallet = () => {
   }, [details, contract])
 }
 
-
-const addCollection = (wallet:any) => {
-  wallet?.contract.createCollection("Wild Forest")
-}
-
-
-
-const createCard = (wallet:any) => {
-  wallet?.contract.mintCard("bonjour", "monde").then((res:any) => console.log(res))
-}
-
-
 export const App = () => {
   const wallet = useWallet()
   const [balance, setBalance] = useState<number>(0)
@@ -64,6 +52,13 @@ export const App = () => {
     )
   }
   
+  const addCollection = (wallet:any) => {
+    wallet?.contract.createCollection("Wild Forest")
+  }
+
+  const createCard = (wallet:any) => {
+    wallet?.contract.mintCard("bonjour", "monde").then((res:any) => console.log(res))
+  }
   
   return (
     <div>
