@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
-import { PokemonCard } from './components/PokemonCard'
-import { getCardById } from './server'
 import './index.css'
-import { space } from 'postcss/lib/list'
+import { Button } from '@mui/joy'
 
 type Canceler = () => void
 const useAffect = (
@@ -45,31 +43,30 @@ const useWallet = () => {
 export const App = () => {
   const wallet = useWallet()
   const [balance, setBalance] = useState<number>(0)
-  
-  const countCollections = (wallet:any) => {
-    wallet?.contract.getNumberCollections().then((res:any) => 
+
+  const countCollections = (wallet: any) => {
+    wallet?.contract.getNumberCollections().then((res: any) =>
       setBalance(res)
     )
   }
-  
-  const addCollection = (wallet:any) => {
+
+  const addCollection = (wallet: any) => {
     wallet?.contract.createCollection("Wild Forest")
   }
 
-  const createCard = (wallet:any) => {
-    wallet?.contract.mintCard("bonjour", "monde").then((res:any) => console.log(res))
+  const createCard = (wallet: any) => {
+    wallet?.contract.mintCard("bonjour", "monde").then((res: any) => console.log(res))
   }
-  
+
   return (
     <div>
       <h1>Welcome to Pokémon TCG</h1>
-      <br/>
-      <button id='btn-models' value="Get Models" onClick={() => addCollection(wallet)}>Add collection</button>
-      <br/>
-      <br/>
-      <button id='btn-models' value="Get Models" onClick={() => countCollections(wallet)}>Get nb collections</button>
+      <br />
+      <Button id='btn-models' value="Get Models" onClick={() => addCollection(wallet)}>Add collection</Button>
+      <br />
+      <br />
+      <Button onClick={() => countCollections(wallet)}>Refresh Collections</Button>
       <p>Nb of Collections : {balance}</p>
-      
     </div>
   )
 }
