@@ -2,9 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
 import './index.css'
-import { Button } from '@mui/joy'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import ProfileView from './components/ProfileView'
+import { BoosterContainer } from './components/BoosterContainer'
+import Home from './components/Home'
 
 type Canceler = () => void
+
 const useAffect = (
   asyncEffect: () => Promise<Canceler | void>,
   dependencies: any[] = []
@@ -23,6 +27,10 @@ const useAffect = (
   }, dependencies)
 }
 
+export type Wallet = {
+  details: ethereum.Details;
+  contract: any;
+} | undefined
 const useWallet = () => {
   const [details, setDetails] = useState<ethereum.Details>()
   const [contract, setContract] = useState<main.Main>()
@@ -40,33 +48,14 @@ const useWallet = () => {
   }, [details, contract])
 }
 
+
 export const App = () => {
   const wallet = useWallet()
-  const [balance, setBalance] = useState<number>(0)
+  const router = createBrowserRouter([
+    { path: "/", element: <Home wallet={wallet} /> },
+    { path: "/profile", element: <ProfileView wallet={wallet} /> },
+    { path: "/booster", element: <BoosterContainer /> }
+  ]);
 
-  const countCollections = (wallet: any) => {
-    wallet?.contract.getNumberCollections().then((res: any) =>
-      setBalance(res)
-    )
-  }
-
-  const addCollection = (wallet: any) => {
-    wallet?.contract.createCollection("Wild Forest")
-  }
-
-  const createCard = (wallet: any) => {
-    wallet?.contract.mintCard("bonjour", "monde").then((res: any) => console.log(res))
-  }
-
-  return (
-    <div>
-      <h1>Welcome to Pokémon TCG</h1>
-      <br />
-      <Button id='btn-models' value="Get Models" onClick={() => addCollection(wallet)}>Add collection</Button>
-      <br />
-      <br />
-      <Button onClick={() => countCollections(wallet)}>Refresh Collections</Button>
-      <p>Nb of Collections : {balance}</p>
-    </div>
-  )
+  return  <RouterProvider router={router} />
 }

@@ -46,7 +46,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
   }
 
   return (
-    <Card onClick={() => setFocused(!focused)} >
+    <Card onClick={() => setFocused(!focused)} className="hover:shadow-xl transition-all" >
       <Info pokemon={pokemon} size={Size.SMALL} />
 
       <Transition in={focused} timeout={400}>

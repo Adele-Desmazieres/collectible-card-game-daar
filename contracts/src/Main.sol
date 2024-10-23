@@ -12,8 +12,7 @@ contract Main is Ownable {
   
   constructor() Ownable(msg.sender) {
     count = 0;
-    console.log("ADMIN : ");
-    console.log(getAdmin());
+    console.log("ADMIN : ", owner(), "msg.sender : ", msg.sender);
   }
   
   fallback() external payable {
@@ -51,8 +50,7 @@ contract Main is Ownable {
   
   // Create a card in specified collection and gives it to user
   // Returns the id of the new card
-  function mintCard(address user, string memory collectionName, string memory cardURI) 
-  public onlyOwner returns (uint256) {
+  function mintCard(address user, string memory collectionName, string memory cardURI) external onlyOwner returns (uint256) {
     console.log("MINT");
     uint cid = collectionNameToId(collectionName);
     return collections[cid].assignNewCard(user, cardURI);
@@ -78,10 +76,6 @@ contract Main is Ownable {
       cards = string.concat(cards, "\n");
     }
     return cards;
-  }
-  
-  function getAdmin() public view returns (address) {
-    return owner();
   }
   
   function isAdmin() public view returns (bool) {
