@@ -1,22 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
 import "./Collection.sol";
 
-contract Main {
+contract Main is Ownable {
   uint256 private count;
   mapping(uint256 => Collection) private collections;
-
-  constructor() {
+  
+  constructor() Ownable(msg.sender) {
     count = 0;
+    console.log("ADMIN : ");
+    console.log(getAdmin());
   }
   
-  // Returns the id of the new collection
-  function createCollection(string calldata name) external returns (uint256) {
-    console.log("===================== CREATE COLLECTION =======================");
+  fallback() external payable {
+    console.log("fallback:", msg.value);
+  }
+
+  receive() external payable {
+    console.log("receive:", msg.value);
+  }
+  
+  // Creates a collection with specified name. 
+  // Returns the id of the new collection.
+  function createCollection(string calldata name) external onlyOwner returns (uint256) {
+    console.log("CREATE COLLECTION");
     uint256 id = count;
     collections[id] = new Collection(name);
     count++;
@@ -28,30 +39,53 @@ contract Main {
     return uint32(count);
   }
   
-  fallback() external payable {
-    console.log("----- fallback:", msg.value);
-  }
-
-  receive() external payable {
-    console.log("----- receive:", msg.value);
+  function collectionNameToId(string memory name) private view returns (uint256) {
+    for (uint i = 0; i < count; i++) {
+      string memory s = (collections[i]).getCollectionName();
+      if (keccak256(bytes(s)) == keccak256(bytes(name))) {
+          return i;
+      }
+    }
+    revert("Collection not found with specified name.");
   }
   
+  // Create a card in specified collection and gives it to user
   // Returns the id of the new card
-  // TODO : make the cardURI be picked randomly in the card set
-  function mintCard(uint256 collectionId, address owner, string memory cardURI) public returns (uint256) {
+  function mintCard(address user, string memory collectionName, string memory cardURI) 
+  public onlyOwner returns (uint256) {
     console.log("MINT");
-    return collections[collectionId].assignNewCard(owner, cardURI);
+    uint cid = collectionNameToId(collectionName);
+    return collections[cid].assignNewCard(user, cardURI);
   }
   
   // Returns the total number of cards of a user
-  function getNumberCardsOf(address owner) public view returns (uint256) {
+  function getNumberCardsOf(address user) public view returns (uint256) {
     console.log("GET NB");
     uint256 nb = 0;
     for (uint256 i = 0; i < count; i++) {
-      nb += collections[i].getNumberCardsOf(owner);
+      nb += collections[i].getNumberCardsOf(user);
     }
     return nb;
   }
   
+  // Returns the string of URL of cards of a user
+  // in one string, sparated by "\n"
+  function getCardsUrlsOf(address user) public view returns (string memory) {
+    console.log("GET URLS");
+    string memory cards = "";
+    for (uint256 i = 0; i < count; i++) {
+      cards = string.concat(cards, collections[i].getCardsUrlsOf(user));
+      cards = string.concat(cards, "\n");
+    }
+    return cards;
+  }
+  
+  function getAdmin() public view returns (address) {
+    return owner();
+  }
+  
+  function isAdmin() public view returns (bool) {
+    return (owner() == msg.sender);
+  }
   
 }

@@ -9,8 +9,7 @@ contract Collection is Ownable, ERC721 {
   uint256 public cardCount;
   uint256 public collectionId;
   mapping(uint256 => Card) cidToCard;
-  mapping(uint256 => address) cidToOwner;
-  // mapping(address => uint256) private ownerToCid;
+  mapping(uint256 => address) cidToUser;
   
   struct Card {
     uint256 cardId;
@@ -22,21 +21,24 @@ contract Collection is Ownable, ERC721 {
     collectionName = _colName;
   }
   
+  function getCollectionName() public view returns (string memory) {
+    return collectionName;
+  }
+  
   function getCardURI(uint256 id) public view returns (string memory) {
     return cidToCard[id].cardURI;
   }
   
   // TODO : comprendre comment gérer l'ajout d'une carte de cardURI déjà utilisé. Est-ce qu'on doit l'empêcher avec un require ? Ou l'autoriser pour avoir plusieurs instances différenciables d'une même carte ? 
-  function assignNewCard(address owner, string memory cardURI) public returns (uint256) {
+  function assignNewCard(address user, string memory cardURI) public returns (uint256) {
     uint256 cardId = cardCount;
-    _safeMint(owner, cardId);
+    _safeMint(user, cardId);
     Card memory c = Card({
       cardId: cardId,
       cardURI: cardURI
     });
     cidToCard[cardId] = c;
-    cidToOwner[cardId] = owner;
-    // ownerToCid[owner].push(cardId);
+    cidToUser[cardId] = user;
     
     cardCount++;
     return cardId;
@@ -46,18 +48,29 @@ contract Collection is Ownable, ERC721 {
     return assignNewCard(msg.sender, cardURI);
   }
   
-  function getNumberCardsOf(address owner) public view returns (uint256) {
+  function getNumberCardsOf(address user) public view returns (uint256) {
     uint256 nb = 0;
     for (uint256 i = 0; i < cardCount; i++) {
-      if (cidToOwner[i] == owner) {
+      if (cidToUser[i] == user) {
         nb += 1;
       }
     }
     return nb;
   }
   
+  function getCardsUrlsOf(address user) public view returns (string memory) {
+    string memory cards = "";
+    for (uint256 i = 0; i < cardCount; i++) {
+      if (cidToUser[i] == user) {
+        cards = string.concat(cards, cidToCard[i].cardURI);
+        cards = string.concat(cards, "\n");
+      }
+    }
+    return cards;
+  }
+  
   // TODO : transfert de carte
-    // vérifier avec require() que le owner de la carte est celui qui appelle le transfert
+    // vérifier avec require() que le user de la carte est celui qui appelle le transfert
     // vérifier que la carte existe
     
 }
