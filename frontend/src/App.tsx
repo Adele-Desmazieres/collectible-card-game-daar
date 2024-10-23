@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ProfileView from './components/ProfileView'
 import { BoosterContainer } from './components/BoosterContainer'
 import Home from './components/Home'
+import AdminView from './components/AdminView'
 
 type Canceler = () => void
 
@@ -54,7 +55,8 @@ export const App = () => {
   const router = createBrowserRouter([
     { path: "/", element: <Home wallet={wallet} /> },
     { path: "/profile", element: <ProfileView wallet={wallet} /> },
-    { path: "/booster", element: <BoosterContainer /> }
+    { path: "/booster", element: <BoosterContainer /> },
+    { path: "/admin", element: <AdminView wallet={wallet} /> }
   ]);
 
   return  <RouterProvider router={router} />
