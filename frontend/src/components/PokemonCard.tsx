@@ -3,6 +3,7 @@ import { CardMedia } from '@mui/material';
 import { useState } from 'react';
 import { Card as CardI } from '../pokemon/interfaces/card'
 import { Transition } from 'react-transition-group';
+import { motion } from 'framer-motion'
 
 type PokemonCardProps = {
   pokemon: CardI
@@ -26,7 +27,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
   const [focused, setFocused] = useState(false);
   function getResistances() {
     let r = ""
-    if (!pokemon.resistances){
+    if (!pokemon.resistances) {
       return r
     }
     for (const res of pokemon.resistances) {
@@ -34,9 +35,10 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
     }
     return r
   }
+
   function getAbilities() {
     let r = ""
-    if (!pokemon.abilities){
+    if (!pokemon.abilities) {
       return r
     }
     for (const res of pokemon.abilities) {
@@ -46,7 +48,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
   }
 
   return (
-    <Card onClick={() => setFocused(!focused)} className="hover:shadow-xl transition-all" >
+    <motion.div onClick={() => setFocused(!focused)} whileHover={{ scale: 1.2 }} >
       <Info pokemon={pokemon} size={Size.SMALL} />
 
       <Transition in={focused} timeout={400}>
@@ -119,7 +121,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           </Modal>
         )}
       </Transition>
-    </Card>
+    </motion.div>
   );
 };
 
