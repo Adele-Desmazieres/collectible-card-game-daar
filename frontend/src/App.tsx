@@ -32,6 +32,7 @@ export type Wallet = {
   details: ethereum.Details;
   contract: any;
 } | undefined
+
 const useWallet = () => {
   const [details, setDetails] = useState<ethereum.Details>()
   const [contract, setContract] = useState<main.Main>()

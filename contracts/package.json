@@ -7,6 +7,7 @@
     "dev": "DOTENV_CONFIG_PATH=../.env hardhat node --export ../frontend/src/contracts.json --watch",
     "console": "DOTENV_CONFIG_PATH=../.env hardhat console",
     "compile": "DOTENV_CONFIG_PATH=../.env hardhat compile",
+    "clean": "DOTENV_CONFIG_PATH=../.env hardhat clean",
     "deploy:local": "DOTENV_CONFIG_PATH=../.env hardhat deploy --network localhost --export ../frontend/src/contracts.json",
     "deploy:staging": "DOTENV_CONFIG_PATH=../.env hardhat deploy --network kovan",
     "deploy:production": "DOTENV_CONFIG_PATH=../.env hardhat deploy --network polygon",
