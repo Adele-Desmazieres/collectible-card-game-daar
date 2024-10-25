@@ -14,6 +14,9 @@ contract Collection is Ownable, ERC721 {
   mapping(uint32 => Booster) bidToBooster;
   mapping(uint32 => address) bidToUser; // owner of the booster
   
+  event cardCreationAssignation(address owner, string cardURL, address author);
+  event boosterCreationAssignation(address owner, uint256 size, address author);
+  
   struct Card {
     string cardURL; // URL on the API of the data of the card
     bool exists;
@@ -28,17 +31,13 @@ contract Collection is Ownable, ERC721 {
   Ownable(msg.sender) ERC721("Pokemon Card", "PKMC") {
     collectionName = _colName;
   }
-  
-  function getCollectionName() public view returns (string memory) {
-    return collectionName;
-  }
-  
-  function getCardURL(uint32 id) public view returns (string memory) {
+    
+  function getCardURL(uint32 id) private view returns (string memory) {
     require(cidToCard[id].exists == true);
     return cidToCard[id].cardURL;
   }
   
-  function makeEmptyBooster() internal pure returns (Booster memory) {
+  function createEmptyBooster() private pure returns (Booster memory) {
     Booster memory b = Booster({
       cardURLs: new string[](0),
       exists: false
@@ -46,12 +45,7 @@ contract Collection is Ownable, ERC721 {
     return b;
   }
   
-  function getNewCard(string memory cardURL) public onlyOwner returns (uint32) {
-    return assignNewCard(msg.sender, cardURL);
-  }
-  
-  // Crée une nouvelle carte avec l'URL spécifié
-  // TODO : rendre cette fonction interne ? (nécessesite de créer une autre fonction interface pour que le main puisse l'appeler)
+  // Create a new card with specified URL and assign it to user. 
   function assignNewCard(address user, string memory cardURL) public returns (uint32) {
     uint32 cardId = cardCount;
     _safeMint(user, cardId);
@@ -63,11 +57,12 @@ contract Collection is Ownable, ERC721 {
     cidToUser[cardId] = user;
     
     cardCount++;
+    emit cardCreationAssignation(user, cardURL, msg.sender);
     return cardId;
   }
   
   // TODO : vérifier que cette opération ne révèle par le contenu du booster
-  function assignNewBooster(address user, string[] memory cardURLs) public returns (uint32) {
+  function assignNewBooster(address user, string[] memory cardURLs) private returns (uint32) {
     uint32 boosterId = boosterCount;
     _safeMint(user, boosterId);
     Booster memory b = Booster({
@@ -78,6 +73,8 @@ contract Collection is Ownable, ERC721 {
     bidToUser[boosterId] = user;
     
     boosterCount++;
+    
+    emit boosterCreationAssignation(user, cardURLs.length, msg.sender);
     return boosterId;
   }
   
@@ -122,7 +119,7 @@ contract Collection is Ownable, ERC721 {
     for (uint32 i = 0; i < cardURLs.length; i++) {
       assignNewCard(bidToUser[bid], cardURLs[i]);
     }
-    bidToBooster[bid] = makeEmptyBooster();
+    bidToBooster[bid] = createEmptyBooster();
     bidToUser[bid] = address(0); 
     // do not reduce boosterCounter 
     // so new booster don't  have the same id as the last one
@@ -143,7 +140,8 @@ contract Collection is Ownable, ERC721 {
     
     bidToUser[bid] = new_owner;
   }
-
+  
+  // TODO : buy a booster
   
   // TODO utiliser les Events pour éviter d'avoir à attendre le rafraichissement de la blockchain ?
      

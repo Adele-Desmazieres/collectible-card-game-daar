@@ -9,7 +9,10 @@ import "./Collection.sol";
 contract Main is Ownable {
   uint32 private count;
   mapping(uint32 => Collection) private collections;
-
+  
+  event adminCollectionCreation(uint32 collectionId, string name, address author);
+  event adminCardGift(address receiver, string collectionName, string cardURI, address author);
+  
   constructor() Ownable(msg.sender) {
     count = 0;
     console.log("ADMIN : ", owner(), "msg.sender : ", msg.sender);
@@ -22,20 +25,7 @@ contract Main is Ownable {
   receive() external payable {
     console.log("receive:", msg.value);
   }
-
-  // Creates a collection with specified name.
-  // Returns the id of the new collection.
-  function createCollection(
-    string calldata name
-  ) external onlyOwner returns (uint32) {
-    console.log("CREATE COLLECTION");
-    uint32 id = count;
-    collections[id] = new Collection(name);
-    count++;
-    console.log("COLLECTION", id, name);
-    return id;
-  }
-
+  
   function getCollections() external view returns (string[] memory) {
     console.log("GET COLLECTIONS");
     string[] memory r = new string[](count);
@@ -43,7 +33,7 @@ contract Main is Ownable {
     console.log("count", count);
     for (uint32 i = 0; i < count; i++) {
       console.log(i);
-      string memory s = (collections[i]).getCollectionName();
+      string memory s = (collections[i]).collectionName();
       console.log(s);
       r[i] = s;
     }
@@ -59,28 +49,16 @@ contract Main is Ownable {
     string memory name
   ) private view returns (uint32) {
     for (uint32 i = 0; i < count; i++) {
-      string memory s = (collections[i]).getCollectionName();
+      string memory s = (collections[i]).collectionName();
       if (keccak256(bytes(s)) == keccak256(bytes(name))) {
         return i;
       }
     }
     revert("Collection not found with specified name.");
   }
-
-  // Create a card in specified collection and gives it to user
-  // Returns the id of the new card
-  function mintCard(
-    address user,
-    string memory collectionName,
-    string memory cardURI
-  ) external onlyOwner returns (uint32) {
-    console.log("MINT");
-    uint32 cid = collectionNameToId(collectionName);
-    return collections[cid].assignNewCard(user, cardURI);
-  }
-
+  
   // Returns the total number of cards of a user
-  function getNumberCardsOf(address user) public view returns (uint32) {
+  function getNumberCardsOf(address user) external view returns (uint32) {
     console.log("GET NB");
     uint32 nb = 0;
     for (uint32 i = 0; i < count; i++) {
@@ -104,4 +82,36 @@ contract Main is Ownable {
   function isAdmin() public view returns (bool) {
     return (owner() == msg.sender);
   }
+  
+  // Creates a collection with specified name.
+  // Returns the id of the new collection.
+  // Only admins can do this. 
+  function createCollection(string calldata name) external onlyOwner returns (uint32) {
+    console.log("CREATE COLLECTION");
+    uint32 id = count;
+    collections[id] = new Collection(name);
+    count++;
+    console.log("COLLECTION", id, " : ", name);
+    
+    emit adminCollectionCreation(id, name, msg.sender);
+    return id;
+  }
+  
+  // Create a card in specified collection and gives it to user.
+  // Returns the id of the new card.
+  // Only admins can do this. 
+  function giveNewCard(
+    address user,
+    string memory collectionName,
+    string memory cardURI
+  ) external onlyOwner returns (uint32) {
+    console.log("MINT");
+    uint32 cid = collectionNameToId(collectionName);
+    
+    emit adminCardGift(user, collectionName, cardURI, msg.sender);
+    return collections[cid].assignNewCard(user, cardURI);
+  }
+  
+  // TODO : admin give new booster ? Not needed.
+  
 }
