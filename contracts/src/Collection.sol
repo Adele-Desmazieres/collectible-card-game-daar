@@ -15,7 +15,6 @@ contract Collection is Ownable, ERC721 {
   mapping(uint32 => address) bidToUser; // owner of the booster
   
   struct Card {
-    uint32 cardId;
     string cardURL; // URL on the API of the data of the card
     bool exists;
   }
@@ -57,7 +56,6 @@ contract Collection is Ownable, ERC721 {
     uint32 cardId = cardCount;
     _safeMint(user, cardId);
     Card memory c = Card({
-      cardId: cardId,
       cardURL: cardURL,
       exists: false
     });
