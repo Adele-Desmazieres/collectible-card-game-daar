@@ -6,21 +6,21 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract Collection is Ownable, ERC721 {
   string public collectionName; // is unique to each collection
-  uint256 public collectionId;
-  uint256 public cardCount;
-  uint256 public boosterCount;
-  mapping(uint256 => Card) cidToCard;
-  mapping(uint256 => address) cidToUser; // owner of the card
-  mapping(uint256 => Booster) bidToBooster;
-  mapping(uint256 => address) bidToUser; // owner of the booster
+  uint32 public collectionId;
+  uint32 public cardCount;
+  uint32 public boosterCount;
+  mapping(uint32 => Card) cidToCard;
+  mapping(uint32 => address) cidToUser; // owner of the card
+  mapping(uint32 => Booster) bidToBooster;
+  mapping(uint32 => address) bidToUser; // owner of the booster
   
   struct Card {
-    uint256 cardId;
-    string cardURI; // URI on the API of the data of the card
+    uint32 cardId;
+    string cardURL; // URL on the API of the data of the card
   }
   
   struct Booster {
-    string[] cardURIs;
+    string[] cardURLs;
   }
   
   constructor(string memory _colName) 
@@ -32,25 +32,25 @@ contract Collection is Ownable, ERC721 {
     return collectionName;
   }
   
-  function getCardURI(uint256 id) public view returns (string memory) {
-    return cidToCard[id].cardURI;
+  function getCardURL(uint32 id) public view returns (string memory) {
+    return cidToCard[id].cardURL;
   }
   
   function getEmptyBooster() internal pure returns (Booster memory) {
     Booster memory b = Booster({
-      cardURIs: new string[](0)
+      cardURLs: new string[](0)
     });
     return b;
   }
     
-  // Crée une nouvelle carte avec l'URI spécifié
+  // Crée une nouvelle carte avec l'URL spécifié
   // TODO : rendre cette fonction interne ? (nécessesite de créer une autre fonction interface pour que le main puisse l'appeler)
-  function assignNewCard(address user, string memory cardURI) public returns (uint256) {
-    uint256 cardId = cardCount;
+  function assignNewCard(address user, string memory cardURL) public returns (uint32) {
+    uint32 cardId = cardCount;
     _safeMint(user, cardId);
     Card memory c = Card({
       cardId: cardId,
-      cardURI: cardURI
+      cardURL: cardURL
     });
     cidToCard[cardId] = c;
     cidToUser[cardId] = user;
@@ -60,11 +60,11 @@ contract Collection is Ownable, ERC721 {
   }
   
   // TODO : vérifier que cette opération ne révèle par le contenu du booster
-  function assignNewBooster(address user, string[] memory cardURIs) public returns (uint256) {
-    uint256 boosterId = boosterCount;
+  function assignNewBooster(address user, string[] memory cardURLs) public returns (uint32) {
+    uint32 boosterId = boosterCount;
     _safeMint(user, boosterId);
     Booster memory b = Booster({
-      cardURIs: cardURIs
+      cardURLs: cardURLs
     });
     bidToBooster[boosterId] = b;
     bidToUser[boosterId] = user;
@@ -73,13 +73,13 @@ contract Collection is Ownable, ERC721 {
     return boosterId;
   }
   
-  function getNewCard(string memory cardURI) public returns (uint256) {
-    return assignNewCard(msg.sender, cardURI);
+  function getNewCard(string memory cardURL) public returns (uint32) {
+    return assignNewCard(msg.sender, cardURL);
   }
   
-  function getNumberCardsOf(address user) public view returns (uint256) {
-    uint256 nb = 0;
-    for (uint256 i = 0; i < cardCount; i++) {
+  function getNumberCardsOf(address user) public view returns (uint32) {
+    uint32 nb = 0;
+    for (uint32 i = 0; i < cardCount; i++) {
       if (cidToUser[i] == user) {
         nb += 1;
       }
@@ -87,21 +87,21 @@ contract Collection is Ownable, ERC721 {
     return nb;
   }
   
-  // TODO : renvoyer plutot un tableau de strings, en initialisant le tableau à sa taille fixe (qui est le nombre de cartes du user dans cette collection)
+  // Returns the list of urls in a string separated by "\n"
   function getCardsUrlsOf(address user) public view returns (string memory) {
-    string memory cards = "";
-    for (uint256 i = 0; i < cardCount; i++) {
+    string memory urls;
+    for (uint32 i = 0; i < cardCount; i++) {
       if (cidToUser[i] == user) {
-        cards = string.concat(cards, cidToCard[i].cardURI);
-        cards = string.concat(cards, "\n");
+        urls = string.concat(urls, cidToCard[i].cardURL);
+        urls = string.concat(urls, "\n");
       }
     }
-    return cards;
+    return urls;
   }
 
-  function getNumberBoostersOf(address user) public view returns (uint256) {
-    uint256 nb = 0;
-    for (uint256 i = 0; i < boosterCount; i++) {
+  function getNumberBoostersOf(address user) public view returns (uint32) {
+    uint32 nb = 0;
+    for (uint32 i = 0; i < boosterCount; i++) {
       if (bidToUser[i] == user) {
         nb += 1;
       }
@@ -109,23 +109,24 @@ contract Collection is Ownable, ERC721 {
     return nb;
   }
   
-  // TODO : ajouter require le sender est le owner du booster
-  function openBooster(uint256 bid) public returns (string[] memory) {
-    string[] memory cardURIs = bidToBooster[bid].cardURIs;
-    for (uint i = 0; i < cardURIs.length; i++) {
-      assignNewCard(bidToUser[bid], cardURIs[i]);
+  // Opens a booster, destroy it, creates new cards and gives them to the booster owner
+  function openBooster(uint32 bid) public returns (string[] memory) {
+    require(msg.sender == bidToUser[bid]);
+    string[] memory cardURLs = bidToBooster[bid].cardURLs;
+    for (uint32 i = 0; i < cardURLs.length; i++) {
+      assignNewCard(bidToUser[bid], cardURLs[i]);
     }
     bidToBooster[bid] = getEmptyBooster();
-    bidToUser[bid] = address(0);
-    
-    // TODO : vérifier que ce que j'ai écrit à 00:32 est correct, et qu'il ne reste pas de moyen d'ouvrir un booster déjà ouvert !!!
-    return cardURIs;
+    bidToUser[bid] = address(0); 
+    // do not reduce boosterCounter so the new booster don't  have the same id as the last one
+    return cardURLs;
   }
   
   // TODO : transfert de carte
     // vérifier avec require() que le user de la carte est celui qui appelle le transfert
     // vérifier que la carte existe
+  // function transferCard(uint32 cid)
   
-  // TODO utiliser les Events pour éviter d'avoir à attendre le rafraichissement de la blockchain
+  // TODO utiliser les Events pour éviter d'avoir à attendre le rafraichissement de la blockchain ?
      
 }

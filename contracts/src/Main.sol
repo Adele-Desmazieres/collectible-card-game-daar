@@ -7,8 +7,8 @@ import "hardhat/console.sol";
 import "./Collection.sol";
 
 contract Main is Ownable {
-  uint256 private count;
-  mapping(uint256 => Collection) private collections;
+  uint32 private count;
+  mapping(uint32 => Collection) private collections;
 
   constructor() Ownable(msg.sender) {
     count = 0;
@@ -27,9 +27,9 @@ contract Main is Ownable {
   // Returns the id of the new collection.
   function createCollection(
     string calldata name
-  ) external onlyOwner returns (uint256) {
+  ) external onlyOwner returns (uint32) {
     console.log("CREATE COLLECTION");
-    uint256 id = count;
+    uint32 id = count;
     collections[id] = new Collection(name);
     count++;
     console.log("COLLECTION", id, name);
@@ -41,7 +41,7 @@ contract Main is Ownable {
     string[] memory r = new string[](count);
 
     console.log("count", count);
-    for (uint256 i = 0; i < count; i++) {
+    for (uint32 i = 0; i < count; i++) {
       console.log(i);
       string memory s = (collections[i]).getCollectionName();
       console.log(s);
@@ -57,8 +57,8 @@ contract Main is Ownable {
 
   function collectionNameToId(
     string memory name
-  ) private view returns (uint256) {
-    for (uint i = 0; i < count; i++) {
+  ) private view returns (uint32) {
+    for (uint32 i = 0; i < count; i++) {
       string memory s = (collections[i]).getCollectionName();
       if (keccak256(bytes(s)) == keccak256(bytes(name))) {
         return i;
@@ -73,28 +73,28 @@ contract Main is Ownable {
     address user,
     string memory collectionName,
     string memory cardURI
-  ) external onlyOwner returns (uint256) {
+  ) external onlyOwner returns (uint32) {
     console.log("MINT");
-    uint cid = collectionNameToId(collectionName);
+    uint32 cid = collectionNameToId(collectionName);
     return collections[cid].assignNewCard(user, cardURI);
   }
 
   // Returns the total number of cards of a user
-  function getNumberCardsOf(address user) public view returns (uint256) {
+  function getNumberCardsOf(address user) public view returns (uint32) {
     console.log("GET NB");
-    uint256 nb = 0;
-    for (uint256 i = 0; i < count; i++) {
+    uint32 nb = 0;
+    for (uint32 i = 0; i < count; i++) {
       nb += collections[i].getNumberCardsOf(user);
     }
     return nb;
   }
 
-  // Returns the string of URL of cards of a user
-  // in one string, sparated by "\n"
+  // Returns the string with the URLs of cards of a user
+  // Concatenated in one string, separated by "\n"
   function getCardsUrlsOf(address user) public view returns (string memory) {
     console.log("GET URLS");
     string memory cards = "";
-    for (uint256 i = 0; i < count; i++) {
+    for (uint32 i = 0; i < count; i++) {
       cards = string.concat(cards, collections[i].getCardsUrlsOf(user));
       cards = string.concat(cards, "\n");
     }
