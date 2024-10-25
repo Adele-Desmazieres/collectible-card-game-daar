@@ -126,7 +126,8 @@ contract Collection is Ownable, ERC721 {
     }
     bidToBooster[bid] = makeEmptyBooster();
     bidToUser[bid] = address(0); 
-    // do not reduce boosterCounter so the new booster don't  have the same id as the last one
+    // do not reduce boosterCounter 
+    // so new booster don't  have the same id as the last one
     return cardURLs;
   }
   
@@ -137,6 +138,14 @@ contract Collection is Ownable, ERC721 {
     
     cidToUser[cid] = new_owner;
   }
+  
+  function transferBoosterTo(uint32 bid, address new_owner) public {
+    require(msg.sender == bidToUser[bid]); // TODO : choose if admin can also do it
+    require(bidToBooster[bid].exists == true);
+    
+    bidToUser[bid] = new_owner;
+  }
+
   
   // TODO utiliser les Events pour éviter d'avoir à attendre le rafraichissement de la blockchain ?
      
