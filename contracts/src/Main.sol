@@ -67,13 +67,13 @@ contract Main is Ownable {
     return nb;
   }
 
-  // Returns the string with the URLs of cards of a user
+  // Returns the string with the ids of cards of a user
   // Concatenated in one string, separated by "\n"
-  function getCardsUrlsOf(address user) public view returns (string memory) {
-    console.log("GET URLS");
+  function getCardsIdsOf(address user) public view returns (string memory) {
+    console.log("GET IDS");
     string memory cards = "";
     for (uint32 i = 0; i < count; i++) {
-      cards = string.concat(cards, collections[i].getCardsUrlsOf(user));
+      cards = string.concat(cards, collections[i].getCardsIdsOf(user));
       cards = string.concat(cards, "\n");
     }
     return cards;
@@ -103,13 +103,13 @@ contract Main is Ownable {
   function giveNewCard(
     address user,
     string memory collectionName,
-    string memory cardURI
+    string memory cardId
   ) external onlyOwner returns (uint32) {
     console.log("MINT");
     uint32 cid = collectionNameToId(collectionName);
     
-    emit adminCardGift(user, collectionName, cardURI, msg.sender);
-    return collections[cid].assignNewCard(user, cardURI);
+    emit adminCardGift(user, collectionName, cardId, msg.sender);
+    return collections[cid].assignNewCard(user, cardId);
   }
   
   // TODO : admin give new booster ? Not needed.

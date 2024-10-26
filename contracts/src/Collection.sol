@@ -3,6 +3,7 @@ pragma solidity ^0.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "hardhat/console.sol";
 
 contract Collection is Ownable, ERC721 {
   string public collectionName; // is unique to each collection
@@ -18,12 +19,12 @@ contract Collection is Ownable, ERC721 {
   event boosterCreationAssignation(address owner, uint256 size, address author);
   
   struct Card {
-    string cardURL; // URL on the API of the data of the card
+    string id; // Pokemon TCG card id
     bool exists;
   }
   
   struct Booster {
-    string[] cardURLs;
+    string[] cardIds;
     bool exists;
   }
   
@@ -34,12 +35,12 @@ contract Collection is Ownable, ERC721 {
     
   function getCardURL(uint32 id) private view returns (string memory) {
     require(cidToCard[id].exists == true);
-    return cidToCard[id].cardURL;
+    return cidToCard[id].id;
   }
   
   function createEmptyBooster() private pure returns (Booster memory) {
     Booster memory b = Booster({
-      cardURLs: new string[](0),
+      cardIds: new string[](0),
       exists: false
     });
     return b;
@@ -49,8 +50,9 @@ contract Collection is Ownable, ERC721 {
   function assignNewCard(address user, string memory cardURL) public returns (uint32) {
     uint32 cardId = cardCount;
     _safeMint(user, cardId);
+    console.log(cardURL);
     Card memory c = Card({
-      cardURL: cardURL,
+      id: cardURL,
       exists: false
     });
     cidToCard[cardId] = c;
@@ -62,11 +64,11 @@ contract Collection is Ownable, ERC721 {
   }
   
   // TODO : vérifier que cette opération ne révèle par le contenu du booster
-  function assignNewBooster(address user, string[] memory cardURLs) private returns (uint32) {
+  function assignNewBooster(address user, string[] memory cardIds) private returns (uint32) {
     uint32 boosterId = boosterCount;
     _safeMint(user, boosterId);
     Booster memory b = Booster({
-      cardURLs: cardURLs,
+      cardIds: cardIds,
       exists: true
     });
     bidToBooster[boosterId] = b;
@@ -74,7 +76,7 @@ contract Collection is Ownable, ERC721 {
     
     boosterCount++;
     
-    emit boosterCreationAssignation(user, cardURLs.length, msg.sender);
+    emit boosterCreationAssignation(user, cardIds.length, msg.sender);
     return boosterId;
   }
   
@@ -88,16 +90,16 @@ contract Collection is Ownable, ERC721 {
     return nb;
   }
   
-  // Returns the list of urls in a string separated by "\n"
-  function getCardsUrlsOf(address user) public view returns (string memory) {
-    string memory urls;
+  // Returns the list of ids in a string separated by "\n"
+  function getCardsIdsOf(address user) public view returns (string memory) {
+    string memory ids;
     for (uint32 i = 0; i < cardCount; i++) {
       if (cidToUser[i] == user && cidToCard[i].exists == true) {
-        urls = string.concat(urls, cidToCard[i].cardURL);
-        urls = string.concat(urls, "\n");
+        ids = string.concat(ids, cidToCard[i].id);
+        ids = string.concat(ids, "\n");
       }
     }
-    return urls;
+    return ids;
   }
 
   function getNumberBoostersOf(address user) public view returns (uint32) {
@@ -115,15 +117,15 @@ contract Collection is Ownable, ERC721 {
     require(msg.sender == bidToUser[bid]);
     require(bidToBooster[bid].exists == true);
     
-    string[] memory cardURLs = bidToBooster[bid].cardURLs;
-    for (uint32 i = 0; i < cardURLs.length; i++) {
-      assignNewCard(bidToUser[bid], cardURLs[i]);
+    string[] memory cardIds = bidToBooster[bid].cardIds;
+    for (uint32 i = 0; i < cardIds.length; i++) {
+      assignNewCard(bidToUser[bid], cardIds[i]);
     }
     bidToBooster[bid] = createEmptyBooster();
     bidToUser[bid] = address(0); 
     // do not reduce boosterCounter 
     // so new booster don't  have the same id as the last one
-    return cardURLs;
+    return cardIds;
   }
   
   // Transfert une carte à quelqu'un

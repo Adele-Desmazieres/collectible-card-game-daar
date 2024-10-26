@@ -1,5 +1,4 @@
 import { Card, Modal, ModalDialog, Table } from '@mui/joy';
-import { CardMedia } from '@mui/material';
 import { useState } from 'react';
 import { Card as CardI } from '../pokemon/interfaces/card'
 import { Transition } from 'react-transition-group';
@@ -7,20 +6,6 @@ import { motion } from 'framer-motion'
 
 type PokemonCardProps = {
   pokemon: CardI
-}
-
-enum Size { LARGE, SMALL }
-
-function Info({ pokemon, size }: { pokemon: CardI, size: Size }) {
-  return (
-    <CardMedia
-      component='img'
-      sx={{ maxWidth: 400 }}
-      image={size == Size.SMALL ? pokemon.images?.small : pokemon.images?.large}
-      title={pokemon.name}
-      alt={pokemon.name}
-    />
-  )
 }
 
 export function PokemonCard({ pokemon }: PokemonCardProps) {
@@ -49,7 +34,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
 
   return (
     <motion.div onClick={() => setFocused(!focused)} whileHover={{ scale: 1.2 }} >
-      <Info pokemon={pokemon} size={Size.SMALL} />
+      <img src={pokemon.images?.small} title={pokemon.name} alt={pokemon.name} />
 
       <Transition in={focused} timeout={400}>
         {(state: string) => (
@@ -87,7 +72,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
               }}
             >
               <Card orientation="horizontal" >
-                <Info pokemon={pokemon} size={Size.LARGE} />
+                <img src={pokemon.images?.large} title={pokemon.name} alt={pokemon.name} />
                 <Table>
                   <tbody>
                     <tr>

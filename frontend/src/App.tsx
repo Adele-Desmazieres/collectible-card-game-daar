@@ -2,11 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as ethereum from '@/lib/ethereum'
 import * as main from '@/lib/main'
 import './index.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProfileView from './components/ProfileView'
 import { BoosterContainer } from './components/BoosterContainer'
 import Home from './components/Home'
 import AdminView from './components/AdminView'
+import UserView from './components/UserView';
+import NotFoundPage from './components/NotFoundPage';
 
 type Canceler = () => void
 
@@ -53,12 +55,17 @@ const useWallet = () => {
 
 export const App = () => {
   const wallet = useWallet()
-  const router = createBrowserRouter([
-    { path: "/", element: <Home wallet={wallet} /> },
-    { path: "/profile", element: <ProfileView wallet={wallet} /> },
-    { path: "/booster", element: <BoosterContainer /> },
-    { path: "/admin", element: <AdminView wallet={wallet} /> }
-  ]);
 
-  return  <RouterProvider router={router} />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminView wallet={wallet} />} />
+        <Route path="/profile" element={<ProfileView wallet={wallet} />} />
+        <Route path="/user/:id" element={<UserView wallet={wallet} />} />
+        <Route path="/booster" element={<BoosterContainer />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
