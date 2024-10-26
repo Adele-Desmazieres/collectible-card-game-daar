@@ -12,6 +12,12 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    wallet?.contract.getNumberCardsOf(userId).then((num: number) => {
+      console.log("getNumberCardsOf", num);
+    })
+  }, [wallet])
+
+  useEffect(() => {
     setLoading(true)
     wallet?.contract.getCardsIdsOf(userId).then((ids: string) => {
       if (ids === '') {

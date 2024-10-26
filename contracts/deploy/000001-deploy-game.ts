@@ -20,7 +20,6 @@ async function setUp(mainContract: Main, admin: string) {
     mainContract.createCollection(set.name)
     const cardsRes: ApiRes<Card> = await apiCall(`cards/by-set/${set.id}`)
     const cards = cardsRes.data.splice(0, 50)
-    if (cards.length < 50) console.log(`set ${set.name} has less than 50 cards`)
     for (const card of cards) {
       mainContract.giveNewCard(admin, set.name, card.id)
     }

@@ -52,10 +52,9 @@ contract Collection is Ownable, ERC721 {
   function assignNewCard(address user, string memory cardURL) public returns (uint32) {
     uint32 cardId = cardCount;
     _safeMint(user, cardId);
-    console.log(cardURL);
     Card memory c = Card({
       id: cardURL,
-      exists: false
+      exists: true
     });
     cidToCard[cardId] = c;
     cidToUser[cardId] = user;
@@ -94,9 +93,9 @@ contract Collection is Ownable, ERC721 {
   
   // Returns the list of ids in a string separated by "\n"
   function getCardsIdsOf(address user) public view returns (string memory) {
-    string memory ids;
+    string memory ids = "";
     for (uint32 i = 0; i < cardCount; i++) {
-      if (cidToUser[i] == user && cidToCard[i].exists == true) {
+      if (cidToUser[i] == user && cidToCard[i].exists) {
         ids = string.concat(ids, cidToCard[i].id);
         ids = string.concat(ids, "\n");
       }
