@@ -7,13 +7,13 @@ export default function Home() {
       <Card>
         <Typography level="h1">Welcome to Pokémon TCG</Typography>
         <div className="flex gap-5">
-          <Button> <Link to="/admin">Go to the admin page</Link> </Button>
-          <Button> <Link to="/">Go to the Marketplace</Link> </Button>
-          <Button> <Link to="/profile">Your profile </Link> </Button>
-          <Button> <Link to="/booster">Open a booster</Link> </Button>
-          <Button> <Link to="/profile/">Someone else's profile</Link> </Button>
+          <Link to="/admin"> <Button> Go to the admin page </Button> </Link>
+          <Link to="/"> <Button> Go to the Marketplace </Button> </Link>
+          <Link to="/profile"> <Button> Your profile </Button> </Link>
+          <Link to="/booster"> <Button> Open a booster </Button> </Link>
+          <Link to="/profile/"> <Button> Someone else's profile </Button> </Link>
         </div>
       </Card>
-    </Container>
+    </Container >
   )
 }

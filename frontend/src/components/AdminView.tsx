@@ -3,6 +3,8 @@ import { Wallet } from "../App";
 import { useEffect, useState } from "react";
 import * as ethereum from '@/lib/ethereum'
 import { ethers } from "ethers";
+import { getCardsBySet } from "@/pokemon/api";
+import { motion } from 'framer-motion'
 
 export default function AdminView({ wallet }: { wallet: Wallet }) {
   const [newCardId, setNewCardId] = useState("")
@@ -12,7 +14,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
   const [newCollection, setNewCollection] = useState("")
   const [newCollectionSaving, setNewCollectionSaving] = useState(false)
 
-  const [newBoosterCol, setNewBoosterCol] = useState("")
+  const [newBoosterCollection, setNewBoosterCollection] = useState("")
   const [newBoosterSaving, setNewBoosterSaving] = useState(false)
 
   const [isAdmin, setIsAdmin] = useState(false)
@@ -34,10 +36,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
     console.log("update collections");
     setCollectionsLoading(true)
     wallet?.contract.getCollections()
-      .then((cols: any) => {
-        console.log("collections", cols)
-        setCollections(cols)
-      })
+      .then((cols: any) => setCollections(cols))
       .finally(() => setCollectionsLoading(false))
   }
 
@@ -62,8 +61,6 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
   function addCard() {
     const adr = wallet?.details.signer?.getAddress()
     setNewCardSaving(true)
-    console.log("newCardCollection", newCardCollection);
-    console.log("newCardUri", newCardId);
     wallet?.contract.giveNewCard(adr, newCardCollection, newCardId)
       .then((tx: ethers.providers.TransactionResponse) => {
         notifyTransaction(tx)
@@ -93,6 +90,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
   }
 
   function getRandomElements<T>(arr: T[], count: number) {
+    console.log("getRandomElements", arr, count);
     if (count > arr.length) throw new Error("Count exceeds array length");
 
     const result = [];
@@ -110,10 +108,12 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
     return result;
   }
 
-  function addBooster() {
+  async function addBooster() {
     setNewBoosterSaving(true)
-    const adr = wallet?.details.signer?.getAddress()
-    wallet?.contract.giveNewBooster(adr, newCollection)
+    const cards = await getCardsBySet(newBoosterCollection)
+    const randomCards = getRandomElements(cards, 8)
+    const adr = await wallet?.details.signer?.getAddress()
+    wallet?.contract.giveNewBooster(adr, newBoosterCollection, randomCards.map(card => card.id))
       .then((tx: ethers.providers.TransactionResponse) => {
         notifyTransaction(tx)
         setNewBoosterSaving(false)
@@ -124,17 +124,14 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
       })
   }
 
-  function getNumberCollection() {
-    wallet?.contract.getNumberCollections()
-      .then((res: any) => setSnackBars([...snackBars, { msg: res, open: true }])
-      )
-  }
   return (
     <Container className="mt-20">
       <Card className="flex justify-center items-center min-h-28" >
-        <Typography gutterBottom level="h1" component="div" className="pt-10">
-          Page d'admin
-        </Typography>
+        <div className="w-full pl-10 pt-10">
+          <Typography gutterBottom level="h1" component="div">
+            Page d'admin
+          </Typography>
+        </div>
         {snackBars.map((sb, i) =>
           <Snackbar
             key={i}
@@ -145,15 +142,13 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
           >{sb.msg}</Snackbar>)}
         {isAdminReq ? <CircularProgress /> :
           !isAdmin ? <h1 className="m-auto">Not an admin</h1> :
-            <div className="my-10">
-              {/* # nouvelle type de booster? # les collections déjà existants(autocomplete pour nouvelle Carte?) */}
-              <Card className="flex flex-col gap-2">
+            <motion.div className="my-10 flex flex-col gap-5">
+              <Card>
                 <CardContent>
-                  <Button onClick={getNumberCollection} >get number of collections</Button>
                   <Typography gutterBottom level="h2" component="div">
                     Nouvelle carte
                   </Typography>
-                  <div className="grid grid-cols-[4fr_1fr_2fr_1fr] gap-5">
+                  <div className="grid grid-cols-[3fr_1fr_2fr_1fr] gap-5">
                     <Input placeholder="ID de la carte Pokémon TCG" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
                     <Input placeholder="Nb de carte" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
                     <Autocomplete placeholder="Collection" options={collectionsLoading ? [] : collections}
@@ -161,40 +156,43 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                         setNewCardCollection(newInputValue);
                       }} />
                     <Button disabled={newCardSaving} onClick={addCard}>
-                      {newCardSaving ? <CircularProgress /> : "Créer"}
+                      {newCardSaving ? <CircularProgress /> : "Créer carte"}
                     </Button>
                   </div>
-
-                  <div className="my-10" >
-                    <Divider />
-                  </div>
-
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent>
                   <Typography gutterBottom level="h2" component="div">
                     Nouvelle collection
                   </Typography>
-                  <div className="grid grid-cols-[7fr_1fr] gap-5">
+                  <div className="grid grid-cols-[6fr_1fr] gap-5">
                     <Input placeholder="Nom de la collection" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
                     <Button disabled={newCollectionSaving} onClick={addCollection}>
                       {newCollectionSaving ? <CircularProgress /> : "Créer collection"}
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="my-10" >
-                    <Divider />
-                  </div>
-
+              <Card>
+                <CardContent>
                   <Typography gutterBottom level="h2" component="div">
                     Nouveau booster
                   </Typography>
-                  <div className="grid grid-cols-[7fr_1fr] gap-5">
-                    <Autocomplete placeholder="Nom de la collection" options={collectionsLoading ? [] : collections} />
+                  <div className="grid grid-cols-[6fr_1fr] gap-5">
+                    <Autocomplete
+                      placeholder="Nom de la collection"
+                      options={collectionsLoading ? [] : collections}
+                      onChange={(_, value: any) => setNewBoosterCollection(value)}
+                    />
                     <Button disabled={newBoosterSaving} onClick={addBooster}>
                       {newBoosterSaving ? <CircularProgress /> : "Créer booster"}
                     </Button>
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
         }
       </Card>
     </Container>

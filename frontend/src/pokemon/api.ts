@@ -3,16 +3,13 @@ import { Card } from './interfaces/card'
 const backend = 'http://localhost:3000'
 
 export async function getCardById(id: string): Promise<Card> {
-  const res = await fetch(`${backend}/cards/by-id/${id}`)
+  const res = await fetch(encodeURI(`${backend}/cards/by-id/${encodeURIComponent(id)}`))
   const json = await res.json()
   return json.data
 }
 
-export async function getCardsByName(
-  name: string,
-  page: number = 1
-): Promise<Card[]> {
-  const res = await fetch(`${backend}/cards?q=name:*${name}*&page=${page}`)
+export async function getCardsBySet(name: string): Promise<Card[]> {
+  const res = await fetch(`${backend}/cards/by-set/${encodeURIComponent(name)}`)
   const json = await res.json()
   return json.data
 }
