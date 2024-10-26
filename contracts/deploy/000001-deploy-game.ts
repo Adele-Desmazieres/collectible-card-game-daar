@@ -16,9 +16,10 @@ async function apiCall<T>(suffix: string): Promise<ApiRes<T>> {
 async function setUp(mainContract: Main, admin: string) {
   const setsRes: ApiRes<Set> = await apiCall('sets/all')
   const sets = setsRes.data.slice(0, 5)
+  console.log(sets);
   Promise.all(sets.map(async set => {
     mainContract.createCollection(set.name)
-    const cardsRes: ApiRes<Card> = await apiCall(`cards/by-set/${set.id}`)
+    const cardsRes: ApiRes<Card> = await apiCall(`cards/by-set/${encodeURIComponent(set.name)}`)
     const cards = cardsRes.data.splice(0, 5)
     for (const card of cards) {
       mainContract.giveNewCard(admin, set.name, card.id)

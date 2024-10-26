@@ -33,7 +33,8 @@ function logError(error) {
 
 app.get('/cards/by-id/:id', async (req, res) => {
 	try {
-		const cards = await axios.get(`${api}/cards/${req.params.id}`, options)
+		console.log('/cars/by-id/' + req.params.id)
+		const cards = await axios.get(`${api}/cards/${encodeURIComponent(req.params.id)}`, options)
 		res.type('json')
 		res.send(cards.data)
 	} catch (e) {
@@ -42,9 +43,10 @@ app.get('/cards/by-id/:id', async (req, res) => {
 	}
 })
 
-app.get('/cards/by-set/:setid', async (req, res) => {
+app.get('/cards/by-set/:setName', async (req, res) => {
 	try {
-		const cards = await axios.get(`${api}/cards?q=set.id:${req.params.setid}`, options)
+		console.log('/cars/by-set/' + req.params.setName)
+		const cards = await axios.get(`${api}/cards?${encodeURIComponent('q=set.name:' + req.params.setName)}`, options)
 		res.type('json')
 		res.send(cards.data)
 	} catch (e) {
@@ -55,18 +57,8 @@ app.get('/cards/by-set/:setid', async (req, res) => {
 
 app.get('/sets/all', async (_, res) => {
 	try {
-		const cards = await axios.get(`${api}/sets?select=id,name`, options)
-		res.type('json')
-		res.send(cards.data)
-	} catch (e) {
-		logError(e)
-		res.sendStatus(500)
-	}
-})
-
-app.get('/sets/:id', async (req, res) => {
-	try {
-		const cards = await axios.get(`${api}/sets/${req.params.id}`, options)
+		console.log('/sets/all')
+		const cards = await axios.get(`${api}/sets?select=name`, options)
 		res.type('json')
 		res.send(cards.data)
 	} catch (e) {

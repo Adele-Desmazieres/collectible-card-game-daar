@@ -49,19 +49,16 @@ contract Collection is Ownable, ERC721 {
   }
   
   // Create a new card with specified URL and assign it to user. 
-  function assignNewCard(address user, string memory cardURL) public returns (uint32) {
-    uint32 cardId = cardCount;
-    _safeMint(user, cardId);
-    Card memory c = Card({
-      id: cardURL,
-      exists: true
-    });
-    cidToCard[cardId] = c;
-    cidToUser[cardId] = user;
+  function assignNewCard(address user, string memory cardId) public returns (uint32) {
+    uint32 cardIndex = cardCount;
+    _safeMint(user, cardIndex);
+    console.log("assignNewCard");
+    cidToCard[cardIndex] = Card(cardId, true);
+    cidToUser[cardIndex] = user;
     
     cardCount++;
-    emit cardCreationAssignation(user, cardURL, msg.sender);
-    return cardId;
+    emit cardCreationAssignation(user, cardId, msg.sender);
+    return cardIndex;
   }
   
   // TODO : vérifier que cette opération ne révèle par le contenu du booster
@@ -94,6 +91,7 @@ contract Collection is Ownable, ERC721 {
   // Returns the list of ids in a string separated by "\n"
   function getCardsIdsOf(address user) public view returns (string memory) {
     string memory ids = "";
+    console.log(cardCount);
     for (uint32 i = 0; i < cardCount; i++) {
       if (cidToUser[i] == user && cidToCard[i].exists) {
         ids = string.concat(ids, cidToCard[i].id);
