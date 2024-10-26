@@ -1,4 +1,4 @@
-import { Card, CardContent, CircularProgress, Container, Divider, Select, Option, Typography, Button, Input, Snackbar } from "@mui/joy";
+import { Card, CardContent, CircularProgress, Container, Divider, Select, Option, Typography, Button, Input, Snackbar, Autocomplete } from "@mui/joy";
 import { Wallet } from "../App";
 import { useEffect, useState } from "react";
 import * as ethereum from '@/lib/ethereum'
@@ -113,14 +113,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                     Nouvelle carte
                   </Typography>
                   <div className="grid grid-cols-[2fr_5fr_1fr] gap-5">
-                    <Select placeholder="Collection" variant="outlined" onChange={(e: any) => {
-                      setNewCardCollection(e.target.textContent)
-                    }}>
-                      {collectionsLoading ? <CircularProgress /> :
-                        collections.length === 0 ? <h1 className="px-5">Wow le vide</h1> :
-                          collections.map(c => <Option key={c} value={c}>{c}</Option>)
-                      }
-                    </Select>
+                    <Autocomplete placeholder="Collection" options={collectionsLoading ? [] : collections} />
                     <Input placeholder="Pokémon TCG Card ID" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
                     <Button disabled={newCardSaving} onClick={addCard}>
                       {newCardSaving ? <CircularProgress /> : "Créer"}
