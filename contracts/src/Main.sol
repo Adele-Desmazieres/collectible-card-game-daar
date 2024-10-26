@@ -30,20 +30,14 @@ contract Main is Ownable {
 
   constructor() Ownable(msg.sender) {
     count = 0;
-    // console.log("ADMIN : ", owner(), ", msg.sender : ", msg.sender);
   }
 
-  fallback() external payable {
-    // console.log("fallback:", msg.value);
-  }
+  fallback() external payable {}
 
-  receive() external payable {
-    // console.log("receive:", msg.value);
-  }
+  receive() external payable {}
 
   // Returns every collections' name.
   function getCollections() external view returns (string[] memory) {
-    // console.log("GET COLLECTIONS");
     string[] memory r = new string[](count);
 
     for (uint32 i = 0; i < count; i++) {
@@ -68,16 +62,15 @@ contract Main is Ownable {
     return nb;
   }
 
-  // Returns the string with the ids of cards of a user
+  // Returns the string with the external ids of cards of a user
   // Concatenated in one string, separated by "\n"
-  function getCardsIdsOf(address user) public view returns (string memory) {
-    // console.log("GET IDS");
-    string memory cards = "";
+  function getCardsExtIdsOf(address user) public view returns (string memory) {
+    string memory extIds = "";
     for (uint32 i = 0; i < count; i++) {
-      cards = string.concat(cards, collections[i].getCardsIdsOf(user));
-      cards = string.concat(cards, "\n");
+      extIds = string.concat(extIds, collections[i].getCardsExtIdsOf(user));
+      extIds = string.concat(extIds, "\n");
     }
-    return cards;
+    return extIds;
   }
 
   function isAdmin() public view returns (bool) {
@@ -103,13 +96,10 @@ contract Main is Ownable {
     string calldata name
   ) external onlyOwner returns (uint32) {
     require(!collectionNameExists(name));
-    // console.log("CREATE COLLECTION");
     uint32 id = count;
     collections[id] = new Collection(name);
     collectionNameToId[name] = id;
     count++;
-    // console.log("COLLECTION", id, " : ", name);
-
     emit adminCollectionCreation(id, name, msg.sender);
     return id;
   }
@@ -123,7 +113,6 @@ contract Main is Ownable {
     string memory cardId
   ) external onlyOwner returns (uint32) {
     require(collectionNameExists(collectionName));
-    // console.log("GIVE CARD");
     uint32 cid = collectionNameToId[collectionName];
     emit adminCardGift(user, collectionName, cardId, msg.sender);
     return collections[cid].assignNewCard(user, cardId);
@@ -138,7 +127,6 @@ contract Main is Ownable {
     string[] memory cardIds
   ) external onlyOwner returns (uint32) {
     require(collectionNameExists(collectionName));
-    // console.log("GIVE BOOSTER");
     uint32 cid = collectionNameToId[collectionName];
     emit adminBoosterGift(user, collectionName, msg.sender);
     return collections[cid].assignNewBooster(user, cardIds);

@@ -19,7 +19,7 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
 
   useEffect(() => {
     setLoading(true)
-    wallet?.contract.getCardsIdsOf(userId).then((ids: string) => {
+    wallet?.contract.getCardsExtIdsOf(userId).then((ids: string) => {
       if (ids === '') {
         setLoading(false)
         return
