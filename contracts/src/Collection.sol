@@ -64,7 +64,7 @@ contract Collection is Ownable, ERC721 {
   }
   
   // TODO : vérifier que cette opération ne révèle par le contenu du booster
-  function assignNewBooster(address user, string[] memory cardIds) private returns (uint32) {
+  function assignNewBooster(address user, string[] memory cardIds) public returns (uint32) {
     uint32 boosterId = boosterCount;
     _safeMint(user, boosterId);
     Booster memory b = Booster({

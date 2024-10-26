@@ -12,6 +12,7 @@ contract Main is Ownable {
   
   event adminCollectionCreation(uint32 collectionId, string name, address author);
   event adminCardGift(address receiver, string collectionName, string cardURI, address author);
+  event adminBoosterGift(address receiver, string collectionName, address author);
   
   constructor() Ownable(msg.sender) {
     count = 0;
@@ -105,13 +106,25 @@ contract Main is Ownable {
     string memory collectionName,
     string memory cardId
   ) external onlyOwner returns (uint32) {
-    console.log("MINT");
+    console.log("GIVE CARD");
+    // TODO : require() que la collection existe bien -> faire une fonction pour ca
     uint32 cid = collectionNameToId(collectionName);
-    
     emit adminCardGift(user, collectionName, cardId, msg.sender);
     return collections[cid].assignNewCard(user, cardId);
   }
   
   // TODO : admin give new booster ? Not needed.
+  function giveNewBooster(
+    address user, 
+    string memory collectionName,
+    string[] memory cardIds
+  ) external onlyOwner returns (uint32) {
+    console.log("GIVE BOOSTER");
+    uint32 cid = collectionNameToId(collectionName);
+    emit adminBoosterGift(user, collectionName, msg.sender);
+    return collections[cid].assignNewBooster(user, cardIds);
+  }
+  
+  // TODO : require que le nom de collection n'existe pas déjà quand on en crée une
   
 }
