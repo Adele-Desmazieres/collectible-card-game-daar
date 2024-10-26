@@ -9,6 +9,7 @@ import "./Collection.sol";
 contract Main is Ownable {
   uint32 private count;
   mapping(uint32 => Collection) private collections;
+  mapping(string => uint32) private collectionNameToId;
   
   event adminCollectionCreation(uint32 collectionId, string name, address author);
   event adminCardGift(address receiver, string collectionName, string cardURI, address author);
@@ -16,7 +17,7 @@ contract Main is Ownable {
   
   constructor() Ownable(msg.sender) {
     count = 0;
-    console.log("ADMIN : ", owner(), "msg.sender : ", msg.sender);
+    console.log("ADMIN : ", owner(), ", msg.sender : ", msg.sender);
   }
 
   fallback() external payable {
@@ -27,11 +28,12 @@ contract Main is Ownable {
     console.log("receive:", msg.value);
   }
   
+  // Returns every collections' name. 
   function getCollections() external view returns (string[] memory) {
     console.log("GET COLLECTIONS");
+    console.log("count : ", count);
     string[] memory r = new string[](count);
 
-    console.log("count", count);
     for (uint32 i = 0; i < count; i++) {
       console.log(i);
       string memory s = (collections[i]).collectionName();
@@ -45,20 +47,8 @@ contract Main is Ownable {
   function getNumberCollections() external view returns (uint32) {
     return uint32(count);
   }
-
-  function collectionNameToId(
-    string memory name
-  ) private view returns (uint32) {
-    for (uint32 i = 0; i < count; i++) {
-      string memory s = (collections[i]).collectionName();
-      if (keccak256(bytes(s)) == keccak256(bytes(name))) {
-        return i;
-      }
-    }
-    revert("Collection not found with specified name.");
-  }
-  
-  // Returns the total number of cards of a user
+    
+  // Returns the total number of cards of a user. 
   function getNumberCardsOf(address user) external view returns (uint32) {
     console.log("GET NB");
     uint32 nb = 0;
@@ -83,14 +73,21 @@ contract Main is Ownable {
   function isAdmin() public view returns (bool) {
     return (owner() == msg.sender);
   }
+    
+  function collectionNameExists(string memory name) private view returns (bool) {
+    string memory name_in_mapping = collections[collectionNameToId[name]].collectionName();
+    return keccak256(bytes(name)) == keccak256(bytes(name_in_mapping));
+  }
   
   // Creates a collection with specified name.
   // Returns the id of the new collection.
   // Only admins can do this. 
   function createCollection(string calldata name) external onlyOwner returns (uint32) {
+    require(!collectionNameExists(name));
     console.log("CREATE COLLECTION");
     uint32 id = count;
     collections[id] = new Collection(name);
+    collectionNameToId[name] = id;
     count++;
     console.log("COLLECTION", id, " : ", name);
     
@@ -106,25 +103,26 @@ contract Main is Ownable {
     string memory collectionName,
     string memory cardId
   ) external onlyOwner returns (uint32) {
+    require(collectionNameExists(collectionName));
     console.log("GIVE CARD");
-    // TODO : require() que la collection existe bien -> faire une fonction pour ca
-    uint32 cid = collectionNameToId(collectionName);
+    uint32 cid = collectionNameToId[collectionName];
     emit adminCardGift(user, collectionName, cardId, msg.sender);
     return collections[cid].assignNewCard(user, cardId);
   }
   
-  // TODO : admin give new booster ? Not needed.
+  // Create a booster in specified collection and with specified cards. 
+  // Returns the id of the new booster. 
+  // Only admins can do this.
   function giveNewBooster(
     address user, 
     string memory collectionName,
     string[] memory cardIds
   ) external onlyOwner returns (uint32) {
+    require(collectionNameExists(collectionName));
     console.log("GIVE BOOSTER");
-    uint32 cid = collectionNameToId(collectionName);
+    uint32 cid = collectionNameToId[collectionName];
     emit adminBoosterGift(user, collectionName, msg.sender);
     return collections[cid].assignNewBooster(user, cardIds);
   }
-  
-  // TODO : require que le nom de collection n'existe pas déjà quand on en crée une
   
 }
