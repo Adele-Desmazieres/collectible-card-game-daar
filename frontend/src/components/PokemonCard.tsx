@@ -34,7 +34,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
 
   return (
     <motion.div onClick={() => setFocused(!focused)} whileHover={{ scale: 1.2 }} >
-      <img src={pokemon.images?.small} title={pokemon.name} alt={pokemon.name} />
+      <img className="max-w-80" src={pokemon.images?.small} title={pokemon.name} alt={pokemon.name} />
 
       <Transition in={focused} timeout={400}>
         {(state: string) => (
@@ -72,7 +72,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
               }}
             >
               <Card orientation="horizontal" >
-                <img src={pokemon.images?.large} title={pokemon.name} alt={pokemon.name} />
+                <img className="w-96" src={pokemon.images?.large} title={pokemon.name} alt={pokemon.name} />
                 <Table>
                   <tbody>
                     <tr>
