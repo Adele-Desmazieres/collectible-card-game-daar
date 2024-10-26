@@ -31,6 +31,8 @@ contract Collection is Ownable, ERC721 {
   constructor(string memory _colName) 
   Ownable(msg.sender) ERC721("Pokemon Card", "PKMC") {
     collectionName = _colName;
+    cardCount = 0;
+    boosterCount = 0;
   }
     
   function getCardURL(uint32 id) private view returns (string memory) {
