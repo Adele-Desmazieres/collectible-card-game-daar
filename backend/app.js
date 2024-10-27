@@ -43,22 +43,10 @@ app.get('/cards/by-id/:id', async (req, res) => {
 	}
 })
 
-app.get('/cards/by-set/:setName', async (req, res) => {
+app.get('/cards/by-set/:id', async (req, res) => {
 	try {
 		console.log('/cards/by-set/' + req.params.setName)
-		const cards = await axios.get(`${api}/cards?${encodeURIComponent('q=set.name:' + req.params.setName) + '&pageSize=24'}`, options)
-		res.type('json')
-		res.send(cards.data)
-	} catch (e) {
-		logError(e)
-		res.sendStatus(500)
-	}
-})
-
-app.get('/cards/by-setid/:id', async (req, res) => {
-	try {
-		console.log('/cards/by-set/' + req.params.setName)
-		const cards = await axios.get(`${api}/cards?${encodeURIComponent('q=set.id:' + req.params.id) + '&pageSize=24'}`, options)
+		const cards = await axios.get(`${api}/cards?${'q=set.id:' + req.params.id}`, options)
 		res.type('json')
 		res.send(cards.data)
 	} catch (e) {

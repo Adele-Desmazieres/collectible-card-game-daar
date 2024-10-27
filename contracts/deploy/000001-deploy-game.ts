@@ -19,11 +19,11 @@ async function setUp(mainContract: Main, admin: string) {
   const sets = setsRes.data.slice(0, 5)
   console.log(sets);
   Promise.all(sets.map(async set => {
-    mainContract.createCollection(set.name)
-    const cardsRes: ApiRes<Card> = await apiCall(`cards/by-setid/${set.id}`)
+    mainContract.createCollection(set.id)
+    const cardsRes: ApiRes<Card> = await apiCall(`cards/by-set/${set.id}`)
     const cards = cardsRes.data.splice(0, 5)
     for (const card of cards) {
-      mainContract.giveNewCard(admin, set.name, card.id)
+      mainContract.giveNewCard(admin, set.id, card.id)
     }
   }))
 }

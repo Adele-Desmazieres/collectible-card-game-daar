@@ -8,8 +8,8 @@ export async function getCardById(id: string): Promise<Card> {
   return json.data
 }
 
-export async function getCardsBySet(name: string): Promise<Card[]> {
-  const res = await fetch(`${backend}/cards/by-set/${encodeURIComponent(name)}`)
+export async function getCardsBySet(id: string): Promise<Card[]> {
+  const res = await fetch(`${backend}/cards/by-set/${id}`)
   const json = await res.json()
   return json.data
 }
