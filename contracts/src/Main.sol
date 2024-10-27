@@ -149,4 +149,8 @@ contract Main is Ownable {
     return bm.getBoosterCountPerCollection(user, count);
   }
   
+  function buyBooster(string memory coName, address payable seller, address buyer) external payable {
+    return bm.buyAnyBooster(coNameToCoId[coName], seller, buyer);
+  }
+  
 }

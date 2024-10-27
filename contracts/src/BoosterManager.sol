@@ -85,20 +85,44 @@ contract BoosterManager is Ownable, ERC721 {
     return openBooster(getAnyBoosterOf(collectionId, user));
   }
   
-  function transferBoosterTo(uint32 bid, address new_owner) public {
+  // admin only
+  function transferBoosterTo(uint32 bid, address user) external {
     require(msg.sender == bidToUser[bid]);
-    bidToUser[bid] = new_owner;
+    bidToUser[bid] = user;
   }
   
-  function buyBooster(uint32 bid) public payable {
+  // msg.sender is the buyer, and the seller has to be the owner of the booster 
+  function buyAnyBooster(uint32 collectionId, address payable seller, address buyer) public payable {
+    uint32 bid = getAnyBoosterOf(collectionId, seller);
+    require(seller == bidToUser[bid]);
+    require(buyer == msg.sender);
     Booster memory b = bidToBooster[bid];
-    require(msg.sender == bidToUser[bid]);
-    require(b.forsale && b.price == msg.value);
-    bidToUser[bid] = msg.sender;
+    require(b.forsale && b.price >= msg.value);
+    bidToUser[bid] = buyer; // change booster ownership
+    seller.transfer(msg.value); // give money to the seller
   }
   
-  // TODO
-  // function setBoosterPrice(uint32 bid, uint32 price)
+  // Set sepcified price and put for sale every boosters from this collection owned by user. 
+  function setBoosterCollectionPrice(address user, uint32 collectionId, uint32 price) public {
+    require(user == msg.sender);
+    for (uint32 i = 0; i < boosterCount; i++) {
+      if (bidToUser[i] == user && bidToCollectionId[i] == collectionId) {
+        bidToBooster[i].price = price;
+        bidToBooster[i].forsale = true;
+      }
+    }
+  }
+  
+  // Remove from sale boosters of specified collection owned by user. 
+  function removeBoosterCollectionPrice(address user, uint32 collectionId) public {
+    require(user == msg.sender);
+    for (uint32 i = 0; i < boosterCount; i++) {
+      if (bidToUser[i] == user && bidToCollectionId[i] == collectionId) {
+        bidToBooster[i].price = 0;
+        bidToBooster[i].forsale = false;
+      }
+    }
+  }
   
   function getBoosterCountPerCollection(address user, uint32 nbCollections) public view returns 
   (uint32[] memory) {
