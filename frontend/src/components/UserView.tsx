@@ -23,9 +23,7 @@ function ColumnView({ cards, col, i }: { cards: CardI[], col: SetI, i: number })
       <div className="flex flex-col items-center pt-5">
         <img src={col.images.logo} alt={col.name + "logo"} />
       </div>
-      <div
-        className="flex flex-row w-full overflow-x-auto overflow-y-hidden whitespace-nowrap gap-7 p-10"
-      >
+      <div className="flex flex-row w-full overflow-x-auto overflow-y-hidden whitespace-nowrap gap-7 p-10" >
         {cards.filter(c => c.set.name === col.name).map((c, j) =>
           <motion.div
             key={'setCard' + j}
@@ -165,9 +163,13 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
               )}
             </motion.div>
             : ordering === 'set'
-              ? collections.map((col, i) => <ColumnView cards={cards} col={col} i={i} key={'set' + i} />)
+              ? collections
+                .sort((c1, c2) => c1.name.localeCompare(c2.name))
+                .map((col, i) => <ColumnView cards={cards} col={col} i={i} key={'set' + i} />)
               /* type */
-              : types.map((type, i) => <TypeView cards={cards} type={type} i={i} key={'type' + i} />)
+              : types
+                .sort((t1, t2) => t1.localeCompare(t2))
+                .map((type, i) => <TypeView cards={cards} type={type} i={i} key={'type' + i} />)
           }
         </div>
       </Card>
