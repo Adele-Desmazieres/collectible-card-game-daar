@@ -130,7 +130,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
   return (
     <Container className="mt-20">
       <Card className="flex justify-center items-center min-h-28" sx={{ "--Card-padding": "0" }} >
-        <div className="w-full pl-10 pb-5 pt-10" style={{ background: 'linear-gradient(to left, #F48FB1, #90CAF9)' }} >
+        <div className="w-full pl-10 pb-5 pt-10 rounded-t-md" style={{ background: 'linear-gradient(to left, #F48FB1, #90CAF9)' }} >
           <Typography level="h1" component="div" textColor='neutral.50'>
             Page d'admin
           </Typography>
@@ -148,7 +148,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
             <motion.div className="mb-10 mt-2 flex flex-col gap-5 mx-10">
               <Card>
                 <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.600">
+                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
                     Nouvelle carte
                   </Typography>
                   <div className="grid grid-cols-[3fr_1fr_2fr_1fr] gap-5">
@@ -166,7 +166,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
               </Card>
               <Card>
                 <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.600">
+                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
                     Nouvelle collection
                   </Typography>
                   <div className="grid grid-cols-[6fr_1fr] gap-5">
@@ -180,7 +180,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
 
               <Card>
                 <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.600">
+                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
                     Nouveau booster
                   </Typography>
                   <div className="grid grid-cols-[6fr_1fr] gap-5">
