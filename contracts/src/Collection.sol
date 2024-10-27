@@ -109,8 +109,20 @@ contract Collection is Ownable, ERC721 {
     return nb;
   }
   
+  function getAnyBoosterOf(address user) private view returns (uint32) {
+    uint32 bid = 0;
+    for (uint32 i = 0; i < boosterCount; i++) {
+      if (user == bidToUser[i]) {
+        bid = i;
+        break;
+      }
+    }
+    require(bidToUser[bid] == user);
+    return bid;
+  }
+    
   // Opens a booster, destroy it, creates new cards and gives them to the booster owner
-  function openBooster(uint32 bid) public returns (string[] memory) {
+  function openBooster(uint32 bid) private returns (string[] memory) {
     require(msg.sender == bidToUser[bid]);
     string[] memory extIds = bidToBooster[bid].extIds;
     for (uint32 i = 0; i < extIds.length; i++) {
@@ -121,6 +133,11 @@ contract Collection is Ownable, ERC721 {
     // do not reduce boosterCounter 
     // so new booster don't have the same id as the last one
     return extIds;
+  }
+  
+  function openAnyBooster(address user) public returns (string[] memory) {
+    require(user == msg.sender);
+    return openBooster(getAnyBoosterOf(user));
   }
   
   function transferCardTo(uint32 cid, address new_owner) public {

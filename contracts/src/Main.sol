@@ -131,4 +131,9 @@ contract Main is Ownable {
     emit adminBoosterGift(user, collectionName, msg.sender);
     return collections[cid].assignNewBooster(user, cardIds);
   }
+  
+  function openBoosterFromCollection(string memory collectionName) external returns (string[] memory) {
+    return collections[collectionNameToId[collectionName]].openAnyBooster(msg.sender);
+  }
+  
 }
