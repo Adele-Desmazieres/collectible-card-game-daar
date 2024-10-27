@@ -11,6 +11,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
   const [newCardCollection, setNewCardCollection] = useState("")
   const [newCardAmount, setNewCardAmount] = useState(1)
   const [newCardSaving, setNewCardSaving] = useState(false)
+  const [newCardAssignTo, setNewCardAssingTo] = useState("")
 
   const [newCollection, setNewCollection] = useState("")
   const [newCollectionSaving, setNewCollectionSaving] = useState(false)
@@ -63,7 +64,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
     const adr = wallet?.details.account
     setNewCardSaving(true)
     for (let i = 0; i < newCardAmount; i++) {
-      wallet?.contract.giveNewCard(adr, newCardCollection, newCardId)
+      wallet?.contract.giveNewCard(newCardAssignTo || adr, newCardCollection, newCardId)
         .then((tx: ethers.providers.TransactionResponse) => {
           notifyTransaction(tx)
           setNewCardSaving(false)
@@ -147,24 +148,29 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
           !isAdmin ? <h1 className="m-auto">Not an admin</h1> :
             <div className="mb-10 mt-2 flex flex-col gap-5 mx-10">
               <motion.div
-                className="border border-gray-200 rounded-md py-10 px-5"
+                className="border border-gray-200 rounded-md py-10 px-5 flex flex-col gap-5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: .2 }}
+                transition={{ duration: 0.3, delay: .2 }}
               >
                 <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
                   Nouvelle carte
                 </Typography>
-                <div className="grid grid-cols-[3fr_1fr_2fr_1fr] gap-5">
-                  <Input placeholder="ID de la carte Pokémon TCG" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
-                  <Input placeholder="Nb de carte" variant="outlined" type="number" onChange={(e) => setNewCardAmount(e.target.value as any as number)} />
+                <div className="grid grid-cols-[2fr_2fr_2fr] gap-5">
+                  <Input placeholder="Pokémon TCG card ID" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
                   <Autocomplete placeholder="Collection" options={collectionsLoading ? [] : collections}
                     onInputChange={(_, newInputValue) => {
                       setNewCardCollection(newInputValue);
                     }} />
+                  <Input placeholder="Number of cards" variant="outlined" type="number" onChange={(e) => setNewCardAmount(e.target.value as any)} />
+                  <Input className="col-span-3" placeholder="Assign to" variant="outlined" onChange={(e) => setNewCardAssingTo(e.target.value)} />
+                </div>
+
+                <div className="grid grid-cols-[6fr_1fr]">
+                  <div></div>
                   <Button disabled={newCardSaving} onClick={addCard} color="neutral">
-                    {newCardSaving ? <CircularProgress /> : "Créer carte"}
+                    {newCardSaving ? <CircularProgress /> : "Create Card"}
                   </Button>
                 </div>
               </motion.div>
@@ -173,15 +179,15 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: .4 }}
+                transition={{ duration: 0.3, delay: .4 }}
               >
                 <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                  Nouvelle collection
+                  New collection
                 </Typography>
                 <div className="grid grid-cols-[6fr_1fr] gap-5">
                   <Input placeholder="Nom de la collection" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
                   <Button disabled={newCollectionSaving} onClick={addCollection} color="neutral">
-                    {newCollectionSaving ? <CircularProgress /> : "Créer collection"}
+                    {newCollectionSaving ? <CircularProgress /> : "Create Collection"}
                   </Button>
                 </div>
               </motion.div>
@@ -191,10 +197,10 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: .6 }}
+                transition={{ duration: 0.3, delay: .6 }}
               >
                 <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                  Nouveau booster
+                  New booster
                 </Typography>
                 <div className="grid grid-cols-[6fr_1fr] gap-5">
                   <Autocomplete
@@ -203,7 +209,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                     onChange={(_, value: any) => setNewBoosterCollection(value)}
                   />
                   <Button disabled={newBoosterSaving} onClick={addBooster} color="neutral">
-                    {newBoosterSaving ? <CircularProgress /> : "Créer booster"}
+                    {newBoosterSaving ? <CircularProgress /> : "Create Booster"}
                   </Button>
                 </div>
               </motion.div>
