@@ -1,4 +1,4 @@
-import { Card, CardContent, CircularProgress, Container, Typography, Button, Input, Snackbar, Autocomplete } from "@mui/joy";
+import { Card, CircularProgress, Container, Typography, Button, Input, Snackbar, Autocomplete } from "@mui/joy";
 import { Wallet } from "../App";
 import { useEffect, useState } from "react";
 import * as ethereum from '@/lib/ethereum'
@@ -145,57 +145,69 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
           >{sb.msg}</Snackbar>)}
         {isAdminReq ? <CircularProgress /> :
           !isAdmin ? <h1 className="m-auto">Not an admin</h1> :
-            <motion.div className="mb-10 mt-2 flex flex-col gap-5 mx-10">
-              <Card>
-                <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                    Nouvelle carte
-                  </Typography>
-                  <div className="grid grid-cols-[3fr_1fr_2fr_1fr] gap-5">
-                    <Input placeholder="ID de la carte Pokémon TCG" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
-                    <Input placeholder="Nb de carte" variant="outlined" type="number" onChange={(e) => setNewCardAmount(e.target.value as any as number)} />
-                    <Autocomplete placeholder="Collection" options={collectionsLoading ? [] : collections}
-                      onInputChange={(_, newInputValue) => {
-                        setNewCardCollection(newInputValue);
-                      }} />
-                    <Button disabled={newCardSaving} onClick={addCard} color="neutral">
-                      {newCardSaving ? <CircularProgress /> : "Créer carte"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                    Nouvelle collection
-                  </Typography>
-                  <div className="grid grid-cols-[6fr_1fr] gap-5">
-                    <Input placeholder="Nom de la collection" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
-                    <Button disabled={newCollectionSaving} onClick={addCollection} color="neutral">
-                      {newCollectionSaving ? <CircularProgress /> : "Créer collection"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="mb-10 mt-2 flex flex-col gap-5 mx-10">
+              <motion.div
+                className="border border-gray-200 rounded-md py-10 px-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.5, delay: .2 }}
+              >
+                <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
+                  Nouvelle carte
+                </Typography>
+                <div className="grid grid-cols-[3fr_1fr_2fr_1fr] gap-5">
+                  <Input placeholder="ID de la carte Pokémon TCG" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
+                  <Input placeholder="Nb de carte" variant="outlined" type="number" onChange={(e) => setNewCardAmount(e.target.value as any as number)} />
+                  <Autocomplete placeholder="Collection" options={collectionsLoading ? [] : collections}
+                    onInputChange={(_, newInputValue) => {
+                      setNewCardCollection(newInputValue);
+                    }} />
+                  <Button disabled={newCardSaving} onClick={addCard} color="neutral">
+                    {newCardSaving ? <CircularProgress /> : "Créer carte"}
+                  </Button>
+                </div>
+              </motion.div>
+              <motion.div
+                className="border border-gray-200 rounded-md py-10 px-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.5, delay: .4 }}
+              >
+                <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
+                  Nouvelle collection
+                </Typography>
+                <div className="grid grid-cols-[6fr_1fr] gap-5">
+                  <Input placeholder="Nom de la collection" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
+                  <Button disabled={newCollectionSaving} onClick={addCollection} color="neutral">
+                    {newCollectionSaving ? <CircularProgress /> : "Créer collection"}
+                  </Button>
+                </div>
+              </motion.div>
 
-              <Card>
-                <CardContent>
-                  <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                    Nouveau booster
-                  </Typography>
-                  <div className="grid grid-cols-[6fr_1fr] gap-5">
-                    <Autocomplete
-                      placeholder="Nom de la collection"
-                      options={collectionsLoading ? [] : collections}
-                      onChange={(_, value: any) => setNewBoosterCollection(value)}
-                    />
-                    <Button disabled={newBoosterSaving} onClick={addBooster} color="neutral">
-                      {newBoosterSaving ? <CircularProgress /> : "Créer booster"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+              <motion.div
+                className="border border-gray-200 rounded-md py-10 px-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.5, delay: .6 }}
+              >
+                <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
+                  Nouveau booster
+                </Typography>
+                <div className="grid grid-cols-[6fr_1fr] gap-5">
+                  <Autocomplete
+                    placeholder="Nom de la collection"
+                    options={collectionsLoading ? [] : collections}
+                    onChange={(_, value: any) => setNewBoosterCollection(value)}
+                  />
+                  <Button disabled={newBoosterSaving} onClick={addBooster} color="neutral">
+                    {newBoosterSaving ? <CircularProgress /> : "Créer booster"}
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
         }
       </Card>
     </Container>

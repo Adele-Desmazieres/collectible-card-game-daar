@@ -58,27 +58,32 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
           </Typography>
         </div>
         <div className="flex flex-col gap-6 mx-10 my-5" >
-          {collections.map(col =>
+          {collections.map((col, i) =>
             <motion.div
               key={col.id}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, scale: .9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, delay: i * .3 }}
               className="bg-gray-100 rounded-md"
             >
               <div className="flex flex-col items-center pt-5">
                 <img src={col.images.logo} alt={col.name + "logo"} />
               </div>
-              <motion.div
+              <div
                 className="flex flex-row w-full overflow-x-auto overflow-y-hidden whitespace-nowrap gap-7 p-10"
-                initial={{ opacity: 0, y: -100 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -100 }}
-                transition={{ duration: 0.5 }}
               >
-                {cards.filter(c => c.set.name === col.name).map((c, i) => <PokemonCard pokemon={c} key={i} />)}
-              </motion.div>
+                {cards.filter(c => c.set.name === col.name).map((c, j) =>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5, delay: j * .1 }}
+                  >
+                    <PokemonCard pokemon={c} key={j} />
+                  </motion.div>
+                )}
+              </div>
             </motion.div>
           )}
         </div>

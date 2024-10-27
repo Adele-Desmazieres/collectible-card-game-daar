@@ -23,6 +23,9 @@ contract Collection is Ownable, ERC721 {
     coName = _colName;
     cardCount = 0;
   }
+  function getCoName() external view returns(string memory) {
+    return coName;
+  }
   
   // Create a new card with specified external id and assign it to user. 
   function assignNewCard(address user, string memory extId) public returns (uint32) {
@@ -65,5 +68,4 @@ contract Collection is Ownable, ERC721 {
     require(msg.sender == cidToUser[cid]);
     cidToUser[cid] = new_owner;
   }
-       
 }

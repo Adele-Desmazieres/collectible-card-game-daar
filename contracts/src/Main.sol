@@ -44,7 +44,7 @@ contract Main is Ownable {
     string[] memory r = new string[](count);
 
     for (uint32 i = 0; i < count; i++) {
-      string memory s = (collections[i]).coName();
+      string memory s = (collections[i]).getCoName();
       r[i] = s;
     }
 
