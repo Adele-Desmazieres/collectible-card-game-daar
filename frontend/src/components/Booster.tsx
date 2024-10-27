@@ -66,9 +66,11 @@ export function Booster({ wallet }: { wallet: Wallet }) {
   const [isTriggered, setIsTriggered] = useState(false);
   const [cards, setCards] = useState<CardI[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleClick = () => {
     setIsTriggered(true);
+    console.log(cards);
     setTimeout(() => {
       setIsTriggered(false);
       setOpened(!opened)
@@ -77,22 +79,47 @@ export function Booster({ wallet }: { wallet: Wallet }) {
 
   useEffect(() => {
     setLoading(true)
-    wallet?.contract.getCollections().then((collections: string[]) => {
-      let randomIndex = Math.floor(Math.random() * collections.length);
-      const collectionName = collections[randomIndex]
-      console.log(collections, collectionName);
-      wallet.contract.openBoosterFromCollection(collectionName).then((cardIds: string[]) => {
-        Promise.all(cardIds.map(cid => getCardById(cid))).then((cards: CardI[]) => {
-          setCards(cards)
+    if (!wallet) return
+    const adr = wallet?.details.account
+    Promise.all([wallet?.contract.getBoostersOf(adr), wallet?.contract.getCollections()])
+      .then(([amounts, collections]: [number[], string[]]) => {
+        const positiveCollections = collections.filter((_, i) => amounts[i] > 0)
+        if (positiveCollections.length === 0) {
+          console.error("no booster assigned to your account")
+          setError("no booster assigned to your account")
           setLoading(false)
-        })
+          return
+        }
+        const rand = Math.floor(Math.random() * positiveCollections.length)
+        console.log(rand);
+        console.log(positiveCollections[rand]);
+        wallet?.contract.openBoosterFromCollection(adr, positiveCollections[rand])
+          .then((tx: any) => {
+            tx.wait().then((receipt: any) => {
+              const event = receipt.events.find((e: any) => e.event === 'BoosterOpened');
+              if (event) {
+                const cardIds = event.args.cardIds;
+                console.log(cardIds);
+                Promise.all(cardIds.map((cid: any) => getCardById(cid)))
+                  .then((cards: CardI[]) => {
+                    console.log(cards)
+                    setCards(cards)
+                  })
+                  .finally(() => setLoading(false));
+              }
+            });
+          });
       })
-    })
   }, [wallet])
 
   return <Container className="mt-32">
     {!opened ?
-      <div className="relative" >
+      <motion.div
+        className="relative"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: .5 }}
+      >
         <motion.div
           className="card-container"
           style={{ left: "50%" }}
@@ -102,22 +129,24 @@ export function Booster({ wallet }: { wallet: Wallet }) {
         >
           <img src={logo} alt="Blurred Background" className="transition-all" style={{ width: '100%', height: 'auto', filter: isTriggered ? '' : 'blur(8px)' }} />
           {loading
-            ?
-            <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} />
-            :
-            <Button onClick={handleClick}
-              className="transition-all"
-              style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} >
-              Open
-            </Button>
+            ? <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} />
+            : error === ""
+              ? <Button onClick={handleClick} className="transition-all" style={{
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1'
+              }} > Open </Button>
+              : <div className="bg-red-400 rounded-md p-5 text-white font-bold" style={{
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'
+              }}>
+                {error}
+              </div>
           }
         </motion.div>
-      </div>
+      </motion.div>
       :
       <motion.div
         className="relative"
-        initial="hidden"
-        animate="visible"
+        initial="visible"
         variants={listVariants}
         style={{ listStyleType: "none", padding: 0 }}
       >
@@ -126,6 +155,7 @@ export function Booster({ wallet }: { wallet: Wallet }) {
             key={card.id}
             className="absolute"
             variants={itemVariants}
+            animate="visible"
             style={{ left: "50%" }}
             initial={{ x: "-50%", y: "50%" }}
             custom={{

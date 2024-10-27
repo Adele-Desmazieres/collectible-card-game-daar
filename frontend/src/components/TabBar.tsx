@@ -47,7 +47,7 @@ const TabBar = () => {
 
       <form onSubmit={handleSearchSubmit} className="flex items-center ml-auto">
         <Input
-          placeholder="Chercher un user"
+          placeholder="Search un user"
           value={searchQuery}
           onChange={handleSearchChange}
           sx={{ width: '400px', marginRight: '8px' }}

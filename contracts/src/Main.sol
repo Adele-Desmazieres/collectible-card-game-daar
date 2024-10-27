@@ -29,6 +29,11 @@ contract Main is Ownable {
     string coName,
     address author
   );
+  event BoosterOpened(
+    address indexed user,
+    string collectionName,
+    string[] cardIds
+  );
 
   constructor() Ownable(msg.sender) {
     count = 0;
@@ -136,12 +141,16 @@ contract Main is Ownable {
     return bm.assignNewBooster(coId, user, cardIds);
   }
   
-  function openBoosterFromCollection(string memory coName) external returns (string[] memory) {
+  function openBoosterFromCollection(address user, string memory coName) external returns (string[] memory) {
     uint32 coId = coNameToCoId[coName];
-    string[] memory extIds = bm.openAnyBooster(coId, msg.sender);
+    string[] memory extIds = bm.openAnyBooster(coId, user);
     for (uint32 i = 0; i < extIds.length; i++) {
       collections[coId].assignNewCard(msg.sender, extIds[i]);
     }
+    for (uint32 i = 0; i < extIds.length; i++) {
+      console.log('openBoosterFromCollection', extIds[i]);
+    }
+    emit BoosterOpened(user, coName, extIds);
     return extIds;
   }
   

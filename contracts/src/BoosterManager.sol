@@ -76,15 +76,17 @@ contract BoosterManager is Ownable, ERC721 {
     
   // Opens a booster, destroy it and returns its content. 
   function openBooster(uint32 bid) private returns (string[] memory) {
-    require(msg.sender == bidToUser[bid]);
+    // require(msg.sender == bidToUser[bid], "booster not assigned to this user");
     string[] memory extIds = bidToBooster[bid].extIds;
+    for (uint32 i = 0; i < extIds.length; i++) {
+      console.log('openBooster', extIds[i]);
+    }
     bidToBooster[bid] = createEmptyBooster();
     bidToUser[bid] = address(0); 
     return extIds;
   }
   
-  function openAnyBooster(uint32 collectionId, address user) public returns (string[] memory) {
-    require(user == msg.sender);
+  function openAnyBooster(uint32 collectionId, address user) external returns (string[] memory) {
     return openBooster(getAnyBoosterOf(collectionId, user));
   }
   

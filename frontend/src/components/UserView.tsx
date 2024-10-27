@@ -21,7 +21,7 @@ function ColumnView({ cards, col, i }: { cards: CardI[], col: SetI, i: number })
       transition={{ duration: 0.25, delay: i * .2, exit: { delay: .1 } }}
     >
       <div className="flex flex-col items-center pt-5">
-        <img src={col.images.logo} alt={col.name + "logo"} />
+        <img src={col.images.logo} alt={col.name + "logo"} className='max-h-52' />
       </div>
       <div className="flex flex-row w-full overflow-x-auto overflow-y-hidden whitespace-nowrap gap-7 p-10" >
         {cards.filter(c => c.set.name === col.name).map((c, j) =>
