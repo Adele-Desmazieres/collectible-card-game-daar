@@ -5,31 +5,34 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
 import "./Collection.sol";
+import "./BoosterManager.sol";
 
 contract Main is Ownable {
   uint32 private count;
+  BoosterManager private bm;
   mapping(uint32 => Collection) private collections;
-  mapping(string => uint32) private collectionNameToId;
+  mapping(string => uint32) private coNameToCoId;
 
   event adminCollectionCreation(
-    uint32 collectionId,
+    uint32 coId,
     string name,
     address author
   );
   event adminCardGift(
     address receiver,
-    string collectionName,
-    string cardURI,
+    string coName,
+    string extId,
     address author
   );
   event adminBoosterGift(
     address receiver,
-    string collectionName,
+    string coName,
     address author
   );
 
   constructor() Ownable(msg.sender) {
     count = 0;
+    bm = new BoosterManager();
   }
 
   fallback() external payable {}
@@ -41,7 +44,7 @@ contract Main is Ownable {
     string[] memory r = new string[](count);
 
     for (uint32 i = 0; i < count; i++) {
-      string memory s = (collections[i]).collectionName();
+      string memory s = (collections[i]).coName();
       r[i] = s;
     }
 
@@ -80,12 +83,12 @@ contract Main is Ownable {
   function collectionNameExists(
     string memory name
   ) private view returns (bool) {
-    uint32 id = collectionNameToId[name];
+    uint32 coId = coNameToCoId[name];
     return
-      id != 0 ||
-      (id == 0 &&
+      coId != 0 ||
+      (coId == 0 &&
         count > 0 &&
-        keccak256(bytes(collections[0].collectionName())) ==
+        keccak256(bytes(collections[0].coName())) ==
         keccak256(bytes(name)));
   }
 
@@ -96,12 +99,12 @@ contract Main is Ownable {
     string calldata name
   ) external onlyOwner returns (uint32) {
     require(!collectionNameExists(name));
-    uint32 id = count;
-    collections[id] = new Collection(name);
-    collectionNameToId[name] = id;
+    uint32 coId = count;
+    collections[coId] = new Collection(name);
+    coNameToCoId[name] = coId;
     count++;
-    emit adminCollectionCreation(id, name, msg.sender);
-    return id;
+    emit adminCollectionCreation(coId, name, msg.sender);
+    return coId;
   }
 
   // Create a card in specified collection and gives it to user.
@@ -109,13 +112,13 @@ contract Main is Ownable {
   // Only admins can do this.
   function giveNewCard(
     address user,
-    string memory collectionName,
+    string memory coName,
     string memory cardId
   ) external onlyOwner returns (uint32) {
-    require(collectionNameExists(collectionName));
-    uint32 cid = collectionNameToId[collectionName];
-    emit adminCardGift(user, collectionName, cardId, msg.sender);
-    return collections[cid].assignNewCard(user, cardId);
+    require(collectionNameExists(coName));
+    uint32 coId = coNameToCoId[coName];
+    emit adminCardGift(user, coName, cardId, msg.sender);
+    return collections[coId].assignNewCard(user, cardId);
   }
 
   // Create a booster in specified collection and with specified cards.
@@ -123,17 +126,23 @@ contract Main is Ownable {
   // Only admins can do this.
   function giveNewBooster(
     address user,
-    string memory collectionName,
+    string memory coName,
     string[] memory cardIds
   ) external onlyOwner returns (uint32) {
-    require(collectionNameExists(collectionName));
-    uint32 cid = collectionNameToId[collectionName];
-    emit adminBoosterGift(user, collectionName, msg.sender);
-    return collections[cid].assignNewBooster(user, cardIds);
+    require(collectionNameExists(coName));
+    uint32 coId = coNameToCoId[coName];
+    emit adminBoosterGift(user, coName, msg.sender);
+    
+    return bm.assignNewBooster(coId, user, cardIds);
   }
   
-  function openBoosterFromCollection(string memory collectionName) external returns (string[] memory) {
-    return collections[collectionNameToId[collectionName]].openAnyBooster(msg.sender);
+  function openBoosterFromCollection(string memory coName) external returns (string[] memory) {
+    uint32 coId = coNameToCoId[coName];
+    string[] memory extIds = bm.openAnyBooster(coId, msg.sender);
+    for (uint32 i = 0; i < extIds.length; i++) {
+      collections[coId].assignNewCard(msg.sender, extIds[i]);
+    }
+    return extIds;
   }
   
 }
