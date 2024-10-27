@@ -46,7 +46,7 @@ app.get('/cards/by-id/:id', async (req, res) => {
 app.get('/cards/by-set/:setName', async (req, res) => {
 	try {
 		console.log('/cars/by-set/' + req.params.setName)
-		const cards = await axios.get(`${api}/cards?${encodeURIComponent('q=set.name:' + req.params.setName)}`, options)
+		const cards = await axios.get(`${api}/cards?${encodeURIComponent('q=set.name:' + req.params.setName)+ '&pageSize=24'}`, options)
 		res.type('json')
 		res.send(cards.data)
 	} catch (e) {

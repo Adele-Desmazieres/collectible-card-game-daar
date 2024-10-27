@@ -36,13 +36,13 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
 
   return (loading
     ? <LinearProgress />
-    : <Container className="grid grid-cols-4 gap-5 h-lvh">
+    : <Container className="mt-20 grid grid-cols-4 gap-5">
       {cards.map(c => <PokemonCard pokemon={c} key={c.id} />)}
     </Container>
   )
 }
 
 export default function UserView({ wallet }: { wallet: Wallet }) {
-  let { userId }: any = useParams()
-  return <UserViewBasic wallet={wallet} userId={userId} />
+  let { id }: any = useParams()
+  return <UserViewBasic wallet={wallet} userId={id} />
 }

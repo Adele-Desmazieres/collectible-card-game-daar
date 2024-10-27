@@ -4,11 +4,11 @@ import * as main from '@/lib/main'
 import './index.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProfileView from './components/ProfileView'
-import { BoosterContainer } from './components/BoosterContainer'
-import Home from './components/Home'
+import { Booster } from './components/Booster'
 import AdminView from './components/AdminView'
 import UserView from './components/UserView';
 import NotFoundPage from './components/NotFoundPage';
+import TabBar from './components/TabBar';
 
 type Canceler = () => void
 
@@ -58,12 +58,12 @@ export const App = () => {
 
   return (
     <BrowserRouter>
+      <TabBar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<ProfileView wallet={wallet} />} />
         <Route path="/admin" element={<AdminView wallet={wallet} />} />
-        <Route path="/profile" element={<ProfileView wallet={wallet} />} />
         <Route path="/user/:id" element={<UserView wallet={wallet} />} />
-        <Route path="/booster" element={<BoosterContainer />} />
+        <Route path="/booster" element={<Booster wallet={wallet} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

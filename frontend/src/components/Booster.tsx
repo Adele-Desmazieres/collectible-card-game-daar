@@ -1,12 +1,13 @@
 import { Card as CardI } from "@/pokemon/interfaces/card";
 import { Container } from '@mui/system'
-import { Button } from '@mui/joy'
-import { useState } from "react";
+import { Button, CircularProgress } from '@mui/joy'
+import { useEffect, useState } from "react";
 import PokemonCard from "./PokemonCard";
 import { motion } from 'framer-motion'
 import './Booster.css'
+import { Wallet } from "../App";
+import { getCardById } from "@/pokemon/api";
 const logo = "https://tcg.pokemon.com/assets/img/global/tcg-card-back-2x.jpg"
-
 
 function CardFlip({ cardFront, cardBack, flipped, onClick }: any) {
   return (
@@ -59,10 +60,12 @@ const shakeVariants = {
   },
 };
 
-export function Booster({ cards }: { cards: CardI[] }) {
+export function Booster({ wallet }: { wallet: Wallet }) {
   const [openedCards, setOpenedCards] = useState<string[]>([])
   const [opened, setOpened] = useState<boolean>(false)
   const [isTriggered, setIsTriggered] = useState(false);
+  const [cards, setCards] = useState<CardI[]>([])
+  const [loading, setLoading] = useState(false)
 
   const handleClick = () => {
     setIsTriggered(true);
@@ -71,6 +74,21 @@ export function Booster({ cards }: { cards: CardI[] }) {
       setOpened(!opened)
     }, 1100); // Reset state after animations
   };
+
+  useEffect(() => {
+    setLoading(true)
+    wallet?.contract.getCollections().then((collections: string[]) => {
+      let randomIndex = Math.floor(Math.random() * collections.length);
+      const collectionName = collections[randomIndex]
+      console.log(collections, collectionName);
+      wallet.contract.openBoosterFromCollection(collectionName).then((cardIds: string[]) => {
+        Promise.all(cardIds.map(cid => getCardById(cid))).then((cards: CardI[]) => {
+          setCards(cards)
+          setLoading(false)
+        })
+      })
+    })
+  }, [wallet])
 
   return <Container className="mt-32">
     {!opened ?
@@ -83,11 +101,16 @@ export function Booster({ cards }: { cards: CardI[] }) {
           animate={isTriggered ? "shake" : "initial"}
         >
           <img src={logo} alt="Blurred Background" className="transition-all" style={{ width: '100%', height: 'auto', filter: isTriggered ? '' : 'blur(8px)' }} />
-          <Button onClick={handleClick}
-            className="transition-all"
-            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} >
-            Open
-          </Button>
+          {loading
+            ?
+            <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} />
+            :
+            <Button onClick={handleClick}
+              className="transition-all"
+              style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: isTriggered ? '0' : '1' }} >
+              Open
+            </Button>
+          }
         </motion.div>
       </div>
       :
