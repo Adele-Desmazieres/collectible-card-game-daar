@@ -67,11 +67,11 @@ contract BoosterManager is Ownable, ERC721 {
         break;
       }
     }
-    require(bidToUser[bid] == user);
+    require(user == bidToUser[bid]); // require that a booster has actually been found
     return bid;
   }
     
-  // Opens a booster, destroy it, creates new cards and gives them to the booster owner
+  // Opens a booster, destroy it and returns its content. 
   function openBooster(uint32 bid) private returns (string[] memory) {
     require(msg.sender == bidToUser[bid]);
     string[] memory extIds = bidToBooster[bid].extIds;
@@ -85,7 +85,7 @@ contract BoosterManager is Ownable, ERC721 {
     return openBooster(getAnyBoosterOf(collectionId, user));
   }
   
-    function transferBoosterTo(uint32 bid, address new_owner) public {
+  function transferBoosterTo(uint32 bid, address new_owner) public {
     require(msg.sender == bidToUser[bid]);
     bidToUser[bid] = new_owner;
   }
@@ -100,5 +100,16 @@ contract BoosterManager is Ownable, ERC721 {
   // TODO
   // function setBoosterPrice(uint32 bid, uint32 price)
   
+  function getBoosterCountPerCollection(address user, uint32 nbCollections) public view returns 
+  (uint32[] memory) {
+    uint32[] memory counts = new uint32[](nbCollections); // counter is at index of its collection id
+    for (uint32 i = 0; i < boosterCount; i++) {
+      if (bidToUser[i] == user) {
+        uint32 collectionId = bidToCollectionId[i];
+        counts[collectionId] += 1;
+      }
+    }
+    return counts;
+  }
 
 }

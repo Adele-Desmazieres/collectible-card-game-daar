@@ -145,4 +145,8 @@ contract Main is Ownable {
     return extIds;
   }
   
+  function getBoostersOf(address user) external view returns (uint32[] memory) {
+    return bm.getBoosterCountPerCollection(user, count);
+  }
+  
 }
