@@ -35,19 +35,6 @@ function CardFlip({ cardFront, cardBack, flipped, onClick }: any) {
   );
 };
 
-
-const listVariants = {
-  visible: { transition: { staggerChildren: 0.1 }, },
-};
-
-const itemVariants = {
-  visible: (custom: { x: number, y: number }) => ({
-    x: custom.x,
-    y: custom.y,
-    transition: { duration: 0.25 },
-  }),
-};
-
 const shakeVariants = {
   initial: { x: "-50%", y: "50%" },
   shake: {
@@ -144,24 +131,18 @@ export function Booster({ wallet }: { wallet: Wallet }) {
         </motion.div>
       </motion.div>
       :
-      <motion.div
-        className="relative"
-        initial="visible"
-        variants={listVariants}
-        style={{ listStyleType: "none", padding: 0 }}
-      >
+      <div className="relative" style={{ listStyleType: "none", padding: 0 }} >
         {cards.map((card, i) =>
           <motion.div
             key={card.id}
             className="absolute"
-            variants={itemVariants}
-            animate="visible"
+            animate={{
+              x: opened ? Math.floor(i % 4) * 275 - 550 : 0,
+              y: opened ? Math.floor(i / 4) * 375 : 0,
+              transition: { duration: 0.25, delay: i * .1 },
+            }}
             style={{ left: "50%" }}
             initial={{ x: "-50%", y: "50%" }}
-            custom={{
-              x: opened ? Math.floor(i % 4) * 275 - 550 : 0,
-              y: opened ? Math.floor(i / 4) * 375 : 0
-            }}
           >
             <CardFlip
               cardFront={<img src={logo} />}
@@ -172,7 +153,7 @@ export function Booster({ wallet }: { wallet: Wallet }) {
             />
           </motion.div>
         )}
-      </motion.div>
+      </div>
     }
   </Container>
 }
