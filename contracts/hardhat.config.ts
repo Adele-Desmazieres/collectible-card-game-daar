@@ -32,12 +32,12 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: '../typechain',
   },
-  networks: {
-    hardhat: {
-      chainId: 31337,
-      allowUnlimitedContractSize: true,
-    },
-  },
+  // networks: {
+  //   hardhat: {
+  //     chainId: 31337,
+  //     allowUnlimitedContractSize: true,
+  //   },
+  // },
 }
 
 export default config
