@@ -12,6 +12,9 @@ contract BoosterManager is Ownable, ERC721 {
   mapping(uint32 => uint32) bidToCollectionId; // TODO : à initialiser lors des créations de booster
   
   event boosterCreationAssignation(address owner, uint256 size, address author);
+  event boosterOpening(address owner, uint32 bid);
+  event boosterTransfer(uint32 bid, address from, address to);
+  event boosterBuy(uint32 bid, address from, address to);
   
   struct Booster {
     string[] extIds;
@@ -85,7 +88,7 @@ contract BoosterManager is Ownable, ERC721 {
     return openBooster(getAnyBoosterOf(collectionId, user));
   }
   
-  // admin only
+  // Allow someone to give its booster.
   function transferBoosterTo(uint32 bid, address user) external {
     require(msg.sender == bidToUser[bid]);
     bidToUser[bid] = user;

@@ -13,6 +13,7 @@ contract Collection is Ownable, ERC721 {
   mapping(uint32 => address) cidToUser; // owner of the card
   
   event cardCreationAssignation(address owner, string extId, address author);
+  event cardTransfer(uint32 cid, address from, address to);
   
   struct Card {
     string extId; // external id, from Pokemon TCG card id
@@ -64,8 +65,9 @@ contract Collection is Ownable, ERC721 {
     return extIds;
   }
 
-  function transferCardTo(uint32 cid, address new_owner) public {
+  function transferCardTo(uint32 cid, address user) public {
     require(msg.sender == cidToUser[cid]);
-    cidToUser[cid] = new_owner;
+    cidToUser[cid] = user;
+    emit cardTransfer(cid, msg.sender, user);
   }
 }
