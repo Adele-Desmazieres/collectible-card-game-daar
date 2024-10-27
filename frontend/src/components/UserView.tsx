@@ -28,6 +28,7 @@ function ColumnView({ cards, col, i }: { cards: CardI[], col: SetI, i: number })
       >
         {cards.filter(c => c.set.name === col.name).map((c, j) =>
           <motion.div
+            key={'setCard' + j}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: .1 + j * .1 }}
@@ -59,6 +60,7 @@ function TypeView({ cards, type, i }: { cards: CardI[], type: Type, i: number })
       >
         {cards.filter(c => c.types?.includes(type)).map((c, j) =>
           <motion.div
+            key={'typeCard' + j}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: .2 + j * .1, exit: { delay: .1 } }}
@@ -150,22 +152,22 @@ export function UserViewBasic({ wallet, userId }: { wallet: Wallet, userId: stri
               className="grid grid-cols-4 gap-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
             >
               {[...cards].sort((c1, c2) => c1.name.localeCompare(c2.name)).map((c, i) =>
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.25, delay: i * .1 }}
+                  key={'card' + i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: i * .05 }}
                 >
-                  <PokemonCard pokemon={c} key={i} />
+                  <PokemonCard pokemon={c} />
                 </motion.div>
               )}
             </motion.div>
             : ordering === 'set'
-              ? collections.map((col, i) => <ColumnView cards={cards} col={col} i={i} />)
+              ? collections.map((col, i) => <ColumnView cards={cards} col={col} i={i} key={'set' + i} />)
               /* type */
-              : types.map((type, i) => <TypeView cards={cards} type={type} i={i} />)
+              : types.map((type, i) => <TypeView cards={cards} type={type} i={i} key={'type' + i} />)
           }
         </div>
       </Card>

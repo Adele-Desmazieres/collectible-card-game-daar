@@ -133,7 +133,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
       <Card className="flex justify-center items-center min-h-28" sx={{ "--Card-padding": "0" }} >
         <div className="w-full pl-10 pb-5 pt-10 rounded-t-md" style={{ background: 'linear-gradient(to left, #F48FB1, #90CAF9)' }} >
           <Typography level="h1" component="div" textColor='neutral.50'>
-            Page d'admin
+            Admin Page
           </Typography>
         </div>
         {snackBars.map((sb, i) =>
@@ -155,7 +155,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                 transition={{ duration: 0.3, delay: .2 }}
               >
                 <Typography gutterBottom level="h2" component="div" textColor="neutral.700">
-                  Nouvelle carte
+                  New Card
                 </Typography>
                 <div className="grid grid-cols-[2fr_2fr_2fr] gap-5">
                   <Input placeholder="Pokémon TCG card ID" variant="outlined" onChange={(e) => setNewCardId(e.target.value)} />
@@ -185,7 +185,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                   New collection
                 </Typography>
                 <div className="grid grid-cols-[6fr_1fr] gap-5">
-                  <Input placeholder="Nom de la collection" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
+                  <Input placeholder="Name" variant="outlined" onChange={(e) => setNewCollection(e.target.value)} />
                   <Button disabled={newCollectionSaving} onClick={addCollection} color="neutral">
                     {newCollectionSaving ? <CircularProgress /> : "Create Collection"}
                   </Button>
@@ -204,7 +204,7 @@ export default function AdminView({ wallet }: { wallet: Wallet }) {
                 </Typography>
                 <div className="grid grid-cols-[6fr_1fr] gap-5">
                   <Autocomplete
-                    placeholder="Nom de la collection"
+                    placeholder="Collection"
                     options={collectionsLoading ? [] : collections}
                     onChange={(_, value: any) => setNewBoosterCollection(value)}
                   />
