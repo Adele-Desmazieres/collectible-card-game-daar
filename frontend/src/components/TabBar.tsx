@@ -8,6 +8,7 @@ const TabBar = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState<string>('')
+  const [tabValue, setTabValue] = useState(location.pathname);
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     setSearchQuery(event.target.value);
@@ -25,7 +26,12 @@ const TabBar = () => {
           Pokémon TCG
         </Typography>
       </div>
-      <Tabs defaultValue={location.pathname} aria-label="navigation tabs" size='sm' >
+      <Tabs
+        value={tabValue}
+        onChange={(_, v: any) => setTabValue(v)}
+        aria-label="navigation tabs"
+        size='sm'
+      >
         <TabList variant="plain" className="bg-white" disableUnderline size='lg' tabFlex={1}>
           <Tab component={Link} to="/" value='/' className="transition-all" disableIndicator >
             <div className="px-5"> Home </div>
